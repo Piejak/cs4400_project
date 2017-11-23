@@ -14,13 +14,13 @@ xls = pd.ExcelFile('MARTA+Database+Info.xlsx')
 # try:
 #     with connection.cursor() as cursor:
 for table in xls.sheet_names:
-    if table == 'Station':
+    if table == 'Conflict':
         df = pd.read_excel('MARTA+Database+Info.xlsx', sheet_name=table)
         for row in df.itertuples():
             if type(row[2]) == float:
                 sql = 'INSERT INTO ' + table + ' VALUES ("' + str(row[1]) + '", NULL);'
             else:
-                sql = 'INSERT INTO ' + table + ' VALUES ("' + str(row[1]) + '", "' + str(row[2]) + '", ' + str(row[3]) + ', ' + str(row[4]) + ', ' + str(row[5]) + ');'
+                sql = 'INSERT INTO ' + table + ' VALUES ("' + str(row[1]) + '", "' + str(row[2]) + '", ' + str(row[3]) + ');'
 
             #cursor.execute(sql)
             print(sql)

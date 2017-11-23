@@ -42,3 +42,8 @@ INSERT INTO Station VALUES ("31955", "Old Milton Pkwy - North Point Pkwy", 2.0, 
 INSERT INTO Station VALUES ("95834", "Old Milton Pkwy - Haynes Bridge Pkwy", 2.0, False, False);
 INSERT INTO Station VALUES ("46612", "Alpharetta Hwy - Commerce Pkwy", 2.0, False, False);
 
+####### CONFLICT ######
+INSERT INTO Conflict VALUES ("sandrapatel", "475861680208144", 2018-11-12 00:00:01);
+INSERT INTO Conflict VALUES ("kellis", "4769432303280540", 2017-10-23 16:21:49);
+INSERT INTO Conflict VALUES ("riyoy1996", "4769432303280540", 2017-10-24 07:31:12);
+
