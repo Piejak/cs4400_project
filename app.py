@@ -6,9 +6,17 @@ SECRET_KEY = b'_5#y2L"F4Q8z\n\xec]/'
 app = Flask(__name__)
 app.config.from_object(__name__)
 
+
+@app.before_request
+def before_request():
+    g.user = None
+    if 'user_id' in session:
+        g.user = query_db('select * from User where username = %s',
+                          [session['user_id']], one=True)
+
 @app.route("/")
 def hello():
-    return "Hello World!"
+    return render_template('home.html')
 
 @app.route("/welcome")
 def welcome():
@@ -33,6 +41,14 @@ def login():
             session['user_id'] = user[0]
             return redirect(url_for('hello'))
     return render_template('login.html', error=error)
+
+
+@app.route('/logout')
+def logout():
+    """Logs the user out."""
+    flash('You were logged out')
+    session.pop('user_id', None)
+    return redirect(url_for('hello'))
 
 
 def query_db(query, args=(), one=False):
