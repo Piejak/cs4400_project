@@ -22,7 +22,7 @@ for table in xls.sheet_names:
             else:
                 sql = 'INSERT INTO ' + table + ' VALUES (' + str(row[1]) + ', "' + str(row[2]) + '", "' + str(row[3]) + '", "' + str(row[4]) + '", "' + str(row[5]) + '");'
 
-            #cursor.execute(sql)
+            # cursor.execute(sql)
             print(sql)
 # finally:
 #     connection.close()
