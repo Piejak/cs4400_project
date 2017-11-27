@@ -43,7 +43,38 @@ INSERT INTO Station VALUES ("95834", "Old Milton Pkwy - Haynes Bridge Pkwy", 2.0
 INSERT INTO Station VALUES ("46612", "Alpharetta Hwy - Commerce Pkwy", 2.0, False, False);
 
 ####### CONFLICT ######
-INSERT INTO Conflict VALUES ("sandrapatel", "475861680208144", 2018-11-12 00:00:01);
-INSERT INTO Conflict VALUES ("kellis", "4769432303280540", 2017-10-23 16:21:49);
-INSERT INTO Conflict VALUES ("riyoy1996", "4769432303280540", 2017-10-24 07:31:12);
+INSERT INTO Conflict VALUES ("sandrapatel", "475861680208144", "2018-11-12 00:00:01");
+INSERT INTO Conflict VALUES ("kellis", "4769432303280540", "2017-10-23 16:21:49");
+INSERT INTO Conflict VALUES ("riyoy1996", "4769432303280540", "2017-10-24 07:31:12");
+
+####### BUSSTATIONINTERSECTION #######
+INSERT INTO BusStationIntersection VALUES ("BUSN11", "Peachtree-Dunwoody Road");# Affected rows: 1
+
+INSERT INTO BusStationIntersection VALUES ("BUSDOME", NULL);# Affected rows: 1
+
+INSERT INTO BusStationIntersection VALUES ("BUSN4", "10th Street");# Affected rows: 1
+
+INSERT INTO BusStationIntersection VALUES ("BUSS2", NULL);# Affected rows: 1
+
+INSERT INTO BusStationIntersection VALUES ("35161", "Park Bridge Pkwy");# Affected rows: 1
+
+INSERT INTO BusStationIntersection VALUES ("31955", "North Point Pkwy");# Affected rows: 1
+
+INSERT INTO BusStationIntersection VALUES ("95834", "Haynes Bridge Pkwy");# Affected rows: 1
+
+INSERT INTO BusStationIntersection VALUES ("46612", "Commerce Pkwy");# Affected rows: 1
+
+###### TRIP ######
+INSERT INTO Trip VALUES (2.75, "2017-11-05 16:21:49", "524807425551662", "N11", "N4");
+INSERT INTO Trip VALUES (1.5, "2017-11-03 09:44:11", "524807425551662", "N4", "N11");
+INSERT INTO Trip VALUES (10.5, "2017-11-02 13:11:11", "1788613719481390", "BUSDOME", "BUSN11");
+INSERT INTO Trip VALUES (4.0, "2017-11-02 13:11:11", "2792083965359460", "31955", "46612");
+INSERT INTO Trip VALUES (2.0, "2017-10-31 22:33:10", "524807425551662", "S7", "N4");
+INSERT INTO Trip VALUES (3.5, "2017-10-31 22:31:10", "7792685035977770", "E1", "N3");
+INSERT INTO Trip VALUES (1.0, "2017-10-31 21:30:00", "1325138309325420", "FP", NULL);
+INSERT INTO Trip VALUES (3.5, "2017-10-28 22:30:10", "6411414737900960", "N11", "N4");
+INSERT INTO Trip VALUES (1.5, "2017-10-28 22:11:13", "9248324548250130", "N4", "N11");
+INSERT INTO Trip VALUES (1.0, "2017-10-27 09:40:11", "8753075721740010", "N3", "N4");
+INSERT INTO Trip VALUES (9.0, "2017-10-27 04:31:30", "7301442590825470", "N4", "S7");
+INSERT INTO Trip VALUES (1.5, "2017-10-10 00:00:00", "7534785562588930", "BUSS2", "BUSDOME");
 
