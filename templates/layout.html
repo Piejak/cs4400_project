@@ -16,34 +16,31 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
+                {% if g.user %}
                 <li>
-                    <a href="/">Home</a>
+                    <a href="{{ url_for('hello') }}">my hello</a>
                 </li>
                 <li>
-                    <a href="/login">Sign In</a>
+                    <a href="{{ url_for('logout') }}">sign out {{ g.user[0] }}</a>
                 </li>
+                {% else %}
+                <li>
+                    <a href="{{ url_for('hello') }}">public hello</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('login') }}">sign in</a>
+                </li>
+                {% endif %}
             </ul>
         </div>
         <!-- /.navbar-collapse -->
     </div>
 
 </nav>
-<div class="container">
-    <h1>Marta</h1>
-    <div class="navigation">
-        {% if g.user %}
-        <a href="{{ url_for('hello') }}">my hello</a> |
-        <a href="{{ url_for('logout') }}">sign out {{ g.user[0] }}</a>
-        {% else %}
-        <a href="{{ url_for('hello') }}">public hello</a> |
-        <a href="{{ url_for('login') }}">sign in</a>
-        {% endif %}
-    </div>
+<div class="container-fluid">
     {% with flashes = get_flashed_messages() %} {% if flashes %}
-    <ul class="flashes">
         {% for message in flashes %}
-        <li>{{ message }} {% endfor %}
-    </ul>
+        <div class="alert alert-info">{{ message }}</div> {% endfor %}
     {% endif %} {% endwith %}
     <div class="body">
         {% block body %}{% endblock %}

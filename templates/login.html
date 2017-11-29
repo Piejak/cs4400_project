@@ -12,14 +12,9 @@
         <label for="password">Password</label>
         <input type="password" name="password" size="30" placeholder="Password" class="form-control" id="password">
     </div>
-    <!-- <dl>
-        <dt>Username:
-            <dd>
-                <input type="text" name="username" size="30" value="{{ request.form.username }}" placeholder="Username" class="form-control">
-        <dt>Password:
-            <dd>
-                <input type="password" name="password" size="30" placeholder="Password" class="form-control">
-    </dl> -->
     <input type="submit" value="Sign In" class="btn btn-default">
+    {% if not g.user %}
+    <a class="btn btn-default" href="/register">Register</a>
+    {% endif %}
 </form>
 {% endblock %}
