@@ -11,9 +11,13 @@ app.config.from_object(__name__)
 @app.before_request
 def before_request():
     g.user = None
+    g.admin = False
     if 'user_id' in session:
         g.user = query_db('select * from User where username = %s',
                           [session['user_id']], one=True)
+        admin_lookup = query_db('''select IsAdmin from User where username = %s''', [session['user_id']], one=True)
+        if admin_lookup[0] == 1:
+            g.admin = True
 
 
 def get_user_id(username):
@@ -64,6 +68,7 @@ def register():
                 # TODO: Add ability to use an existing breeze card
                 #they already have a breezecard they want to use
                 #need to lookup breezecards and make sure that the number entered is a card that 1. exists and 2. belongs to no one
+                # if the card belongs to someone, generate a new card and suspend the old one
                 return NotImplementedError
             flash('You were successfully registered and can login now')
             return redirect(url_for('login'))
@@ -72,8 +77,8 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """Logs the user in."""
-    # if g.user:
-    #     return redirect(url_for('hello'))
+    if g.user:
+        return redirect(url_for('hello'))
     error = None
     if request.method == 'POST':
         user = query_db('''select * from User where
