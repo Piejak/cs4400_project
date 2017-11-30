@@ -1,0 +1,38 @@
+{% extends "layout.html" %} 
+{% block title %}Station Management{% endblock %} 
+
+{% block body %}
+<h2>Station Management <a href="{{url_for('create_station')}}" class="btn btn-default">Create Station</a> </h2>
+
+{% if error %}
+<div class="error">
+    <strong>Error:</strong> {{ error }}
+</div>
+{% endif %}
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Station Name</th>
+            <th>Stop ID</th>
+            <th>Fare</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for station in stations %}
+            <tr>
+                <td>{{station[1]}}</td>
+                <td>{{station[0]}}</td>
+                <td>${{station[2]}}</td>
+                {% if station[3] %}
+                    <td>Closed</td>
+                {% else %}
+                    <td>Open</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

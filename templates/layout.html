@@ -13,36 +13,59 @@
             </button>
             <a class="navbar-brand" href="#">Marta</a>
         </div>
-        <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                {% if g.user %}
+                {% if g.admin %}
                 <li>
-                    <a href="{{ url_for('hello') }}">my hello</a>
+                    <a href="{{ url_for('station_management') }}">Station Management</a>
                 </li>
                 <li>
-                    <a href="{{ url_for('logout') }}">sign out {{ g.user[0] }}</a>
+                    <a href="{{ url_for('hello') }}">Suspended Cards</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('hello') }}">Breeze Card Management</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('hello') }}">Passenger Flow Report</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('logout') }}">Sign Out {{ g.user[0] }}</a>
+                </li>
+                {% elif g.user %}
+                <li>
+                    <a href="{{ url_for('hello') }}">Home</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('hello') }}">Manage Cards</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('hello') }}">Trip History</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('logout') }}">Sign Out {{ g.user[0] }}</a>
                 </li>
                 {% else %}
                 <li>
-                    <a href="{{ url_for('hello') }}">public hello</a>
+                    <a href="{{ url_for('login') }}">Sign In</a>
                 </li>
                 <li>
-                    <a href="{{ url_for('login') }}">sign in</a>
+                    <a href="{{ url_for('register') }}">Register</a>
                 </li>
                 {% endif %}
             </ul>
         </div>
-        <!-- /.navbar-collapse -->
     </div>
-
 </nav>
-<div class="container-fluid">
-    {% with flashes = get_flashed_messages() %} {% if flashes %}
-        {% for message in flashes %}
-        <div class="alert alert-info">{{ message }}</div> {% endfor %}
-    {% endif %} {% endwith %}
-    <div class="body">
-        {% block body %}{% endblock %}
-    </div>
+
+<div class="container">
+    {% with flashes = get_flashed_messages() %} 
+        {% if flashes %}
+            {% for message in flashes %}
+                <div class="alert alert-info">{{ message }}</div> 
+            {% endfor %}
+        {% endif %} 
+    {% endwith %}
+</div>
+<div class="container">
+    {% block body %}{% endblock %}
 </div>

@@ -27,8 +27,34 @@ def get_user_id(username):
     return rv[0] if rv else None
 
 @app.route("/")
-def hello():
-    return render_template('home.html')
+def home():
+    if g.admin:
+        return redirect(url_for(station_management))
+    elif g.user:
+        return redirect(url_for(user_home))
+    else:
+        return redirect(url_for(login))
+
+@app.route("/userHome")
+def user_home():
+    if g.admin or not g.user:
+        return redirect(url_for(home))
+    return render_template('userHome.html')
+
+@app.route("/stationManagement")
+def station_management():
+    if not g.admin:
+        error = 'You must be an admin to view this page'
+        return redirect(url_for('home'))
+    return render_template('stationManagement.html', stations=query_db('''select * from Station;'''))
+
+
+@app.route("/createStation", methods=['GET', 'POST'])
+def create_station():
+    if not g.admin:
+        error = 'You must be an admin to view this page'
+        return redirect(url_for('home'))
+    return render_template('createStation.html')
 
 @app.route("/welcome")
 def welcome():
@@ -38,7 +64,7 @@ def welcome():
 def register():
     """Registers the user."""
     if g.user:
-        return redirect(url_for('hello'))
+        return redirect(url_for('home'))
     error = None
     if request.method == 'POST':
         if not request.form['username']:
@@ -78,7 +104,7 @@ def register():
 def login():
     """Logs the user in."""
     if g.user:
-        return redirect(url_for('hello'))
+        return redirect(url_for('home'))
     error = None
     if request.method == 'POST':
         user = query_db('''select * from User where
@@ -91,7 +117,9 @@ def login():
         else:
             flash('You were logged in')
             session['user_id'] = user[0]
-            return redirect(url_for('hello'))
+            if user[2]:
+                return redirect(url_for('station_management'))
+            return redirect(url_for('home'))
     return render_template('login.html', error=error)
 
 
@@ -100,7 +128,7 @@ def logout():
     """Logs the user out."""
     flash('You were logged out')
     session.pop('user_id', None)
-    return redirect(url_for('hello'))
+    return redirect(url_for('home'))
 
 
 def query_db(query, args=(), one=False):
