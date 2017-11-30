@@ -19,7 +19,25 @@
     <div class="form-group">
         <label for="rPassword2">Password <small>(repeat)</small></label>
         <input type="password" name="password2" size="30" placeholder="Password" id="rPassword2" class="form-control">
-    </div>        
+    </div>
+    <div class="form-group">
+        <label for="breezeNumber">Breeze Card</label>
+        <div class="input-group">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="breezeSelect" value="Get a new Breeze Card">
+                    Get a new Breeze Card
+                </label>
+                <span class="input-group-addon">
+                    <label>
+                        <input type="radio" name="breezeSelect" value="Use my existing Breeze Card">
+                        Use my existing Breeze Card
+                    </label>
+                </span>
+                <input type="text" class="form-control" name="breezeNumber" placeholder="Breeze Card Number">
+            </div>
+        </div>
+    </div>
     <input type="submit" value="Sign Up" class="btn btn-default">
 </form>
 {% endblock %}

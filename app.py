@@ -1,6 +1,7 @@
 from flask import Flask, render_template, g, request, flash, session, redirect, url_for
 import pymysql
 import hashlib
+import random
 
 SECRET_KEY = b'_5#y2L"F4Q8z\n\xec]/'
 app = Flask(__name__)
@@ -48,10 +49,22 @@ def register():
         elif get_user_id(request.form['username']) is not None:
             error = 'The username is already taken'
         else:
-            
-            post_db('''insert into User (
-              Username, Password) values (%s, %s, FALSE);''',
-                       [request.form['username'], generate_password_hash(request.form['password'])])
+            post_db('''insert into User (Username, Password, IsAdmin) values (%s, %s, FALSE);''', [request.form['username'], generate_password_hash(request.form['password'])])
+            post_db('''insert into Passenger (Username, Email) values (%s, %s)''', [request.form['username'], request.form['email']])
+            if not request.form['breezeNumber']:
+                #need to generate a new breezecard number
+                generated_number = random.randint(1000000000000000, 9999999999999999)
+                duplicate = query_db('''select BreezecardNum from Breezecard where BreezecardNum = %s''', generated_number)
+                #keeps generating a new number until we find one that isn't taken
+                while duplicate:
+                    generated_number = random.randint(1000000000000000, 9999999999999999)
+                    duplicate = query_db('''select BreezecardNum from Breezecard where BreezecardNum = %s''', generated_number)
+                post_db('''insert into Breezecard values (%s, 0, %s)''', [generated_number, request.form['username']])
+            else:
+                # TODO: Add ability to use an existing breeze card
+                #they already have a breezecard they want to use
+                #need to lookup breezecards and make sure that the number entered is a card that 1. exists and 2. belongs to no one
+                return NotImplementedError
             flash('You were successfully registered and can login now')
             return redirect(url_for('login'))
     return render_template('register.html', error=error)
@@ -109,7 +122,7 @@ def post_db(query, args=()):
     try:
         with connection.cursor() as cursor:
             cursor.execute(query, args)
-            cursor.commit()
+        connection.commit()
     finally:
         connection.close()
 
