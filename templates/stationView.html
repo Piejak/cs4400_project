@@ -1,0 +1,24 @@
+{% extends "layout.html" %} {% block title %}Station View{% endblock %} {% block body %}
+<h2>Station View - {{ station[1] }}</h2>
+<p>Stop {{ station[0] }}</p>
+<p>{{ station }}</p>
+
+{% if error %}
+<div class="error">
+    <strong>Error:</strong> {{ error }}
+</div>
+{% endif %}
+
+<form class="form-inline">
+    <label for="entryFare" class="col-sm-2 control-label">Entry Fare</label>
+    <div class="input-group">
+        <div class="input-group-addon">$</div>
+        <input type="text" name="entryFare" size="30" placeholder="{{ station[2] }}" id="entryFare" class="form-control">
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Update Fare</button>
+    </div>
+</form>
+<p>Nearest intersection - Not available for train stations</p>
+
+{% endblock %}

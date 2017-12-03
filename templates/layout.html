@@ -1,6 +1,12 @@
 <!doctype html>
 <title>{% block title %}Welcome{% endblock %} | Marta</title>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+    crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+    crossorigin="anonymous"></script>
 <nav class="navbar navbar-default">
     <div class="container-fluid">
         <div class="navbar-header">
@@ -11,7 +17,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Marta</a>
+            <a class="navbar-brand" href="{{ url_for('home') }}">Marta</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
@@ -20,26 +26,23 @@
                     <a href="{{ url_for('station_management') }}">Station Management</a>
                 </li>
                 <li>
-                    <a href="{{ url_for('hello') }}">Suspended Cards</a>
+                    <a href="{{ url_for('suspended_cards') }}">Suspended Cards</a>
                 </li>
                 <li>
-                    <a href="{{ url_for('hello') }}">Breeze Card Management</a>
+                    <a href="{{ url_for('card_management') }}">Breeze Card Management</a>
                 </li>
                 <li>
-                    <a href="{{ url_for('hello') }}">Passenger Flow Report</a>
+                    <a href="{{ url_for('flow_report') }}">Passenger Flow Report</a>
                 </li>
                 <li>
                     <a href="{{ url_for('logout') }}">Sign Out {{ g.user[0] }}</a>
                 </li>
                 {% elif g.user %}
                 <li>
-                    <a href="{{ url_for('hello') }}">Home</a>
+                    <a href="{{ url_for('user_manage_cards') }}">Manage Cards</a>
                 </li>
                 <li>
-                    <a href="{{ url_for('hello') }}">Manage Cards</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('hello') }}">Trip History</a>
+                    <a href="{{ url_for('trip_history') }}">Trip History</a>
                 </li>
                 <li>
                     <a href="{{ url_for('logout') }}">Sign Out {{ g.user[0] }}</a>

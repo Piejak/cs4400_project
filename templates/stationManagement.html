@@ -22,7 +22,7 @@
     <tbody>
         {% for station in stations %}
             <tr>
-                <td>{{station[1]}}</td>
+                <td><a href="{{ url_for('station_view', station=station[0]) }}">{{station[1]}}</a></td>
                 <td>{{station[0]}}</td>
                 <td>${{station[2]}}</td>
                 {% if station[3] %}

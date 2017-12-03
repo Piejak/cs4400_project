@@ -1,0 +1,38 @@
+{% extends "layout.html" %} {% block title %}Suspended Cards{% endblock %} {% block body %}
+<h2>Suspended Cards
+    <a href="{{url_for('create_station')}}" class="btn btn-default">Add Selected Card to New Owner</a>
+    <a href="{{url_for('create_station')}}" class="btn btn-default">Add Selected Card to Old Owner</a>
+</h2>
+
+{% if error %}
+<div class="error">
+    <strong>Error:</strong> {{ error }}
+</div>
+{% endif %}
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Card #</th>
+            <th>New Owner</th>
+            <th>Date Suspended</th>
+            <th>Previous Owner</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for station in stations %}
+        <tr>
+            <td>{{station[1]}}</td>
+            <td>{{station[0]}}</td>
+            <td>${{station[2]}}</td>
+            {% if station[3] %}
+            <td>Closed</td>
+            {% else %}
+            <td>Open</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

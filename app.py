@@ -1,7 +1,7 @@
-from flask import Flask, render_template, g, request, flash, session, redirect, url_for
 import pymysql
 import hashlib
 import random
+from flask import Flask, render_template, g, request, flash, session, redirect, url_for
 
 SECRET_KEY = b'_5#y2L"F4Q8z\n\xec]/'
 app = Flask(__name__)
@@ -29,11 +29,11 @@ def get_user_id(username):
 @app.route("/")
 def home():
     if g.admin:
-        return redirect(url_for(station_management))
+        return redirect(url_for('station_management'))
     elif g.user:
-        return redirect(url_for(user_home))
+        return redirect(url_for('user_home'))
     else:
-        return redirect(url_for(login))
+        return redirect(url_for('login'))
 
 @app.route("/userHome")
 def user_home():
@@ -41,12 +41,48 @@ def user_home():
         return redirect(url_for(home))
     return render_template('userHome.html')
 
+@app.route('/manageCards')
+def user_manage_cards():
+    if g.admin or not g.user:
+        return redirect(url_for(home))
+    return render_template('userManageCards.html')
+
+@app.route('/tripHistory')
+def trip_history():
+    if g.admin or not g.user:
+        return redirect(url_for(home))
+    return render_template('tripHistory.html')
+
+@app.route("/suspendedCards")
+def suspended_cards():
+    if not g.admin:
+        return redirect(url_for('home'))
+    return render_template('stationManagement.html', stations=query_db('''select * from Station;'''))
+
+@app.route('/cardManagement')
+def card_management():
+    if not g.admin:
+        return redirect(url_for('home'))
+    return render_template('cardManagement.html')
+
+@app.route('/flowReport')
+def flow_report():
+    if not g.admin:
+        return redirect(url_for('home'))
+    return render_template('flowReport.html')
+
 @app.route("/stationManagement")
 def station_management():
     if not g.admin:
-        error = 'You must be an admin to view this page'
         return redirect(url_for('home'))
     return render_template('stationManagement.html', stations=query_db('''select * from Station;'''))
+
+@app.route('/<station>')
+def station_view(station):
+    station_info = query_db('''select * from Station where StopID = %s''', station, one=True)
+    if not station_info:
+        abort(404)
+    return render_template('stationView.html', station=station_info)
 
 
 @app.route("/createStation", methods=['GET', 'POST'])

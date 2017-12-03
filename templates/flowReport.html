@@ -1,0 +1,26 @@
+{% extends "layout.html" %} {% block title %}Passenger Flow Report{% endblock %} {% block body %}
+<h2>Passenger Flow Report
+    <a href="{{url_for('create_station')}}" class="btn btn-default">Create Station</a>
+</h2>
+
+{% if error %}
+<div class="error">
+    <strong>Error:</strong> {{ error }}
+</div>
+{% endif %}
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Station Name</th>
+            <th>Stop ID</th>
+            <th>Fare</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+{% endblock %}
