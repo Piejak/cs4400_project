@@ -38,21 +38,32 @@ def home():
 @app.route("/userHome")
 def user_home():
     if g.admin or not g.user:
-        return redirect(url_for(home))
+        return redirect(url_for('home'))
     return render_template('userHome.html', breezeCards=query_db('''select BreezeCardNum, Value from Breezecard where BelongsTo = %s''', session['user_id']))
 
 @app.route('/manageCards')
 def user_manage_cards():
     if g.admin or not g.user:
-        return redirect(url_for(home))
+        return redirect(url_for('home'))
     return render_template('userManageCards.html', breezeCards=query_db('''select BreezeCardNum, Value from Breezecard where BelongsTo = %s''', session['user_id']))
 
+@app.route('/<breezecard>')
+def add_funds(breezecard):
+    if not g.user or g.admin:
+        return redirect(url_for('home'))
+    print(query_db(
+        '''select BelongsTo from Breezecard where BreezecardNum = %s''', breezecard, one=True)[0])
+    if query_db('''select BelongsTo from Breezecard where BreezecardNum = %s''', breezecard, one=True)[0] != session['user_id']:
+        #if the breezecard doesnt belong to the logged in user
+        return redirect(url_for('home'))
+    card_info = query_db('''select BreezecardNum, Value from Breezecard where BreezecardNum = %s''', breezecard, one=True)
+    return render_template('addFunds.html', cardInfo=card_info)
+
 @app.route('/tripHistory', methods=['GET', 'POST'])
-def trip_history(startTime=None, endTime=None):
+def trip_history():
     if g.admin or not g.user:
         return redirect(url_for(home))
     if request.method == 'POST':
-        print(request.form['startTime'], ' ', request.form['endTime'])
         if request.form['startTime'] and request.form['endTime']:
             #we have both start and end time
             return render_template('tripHistory.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime < %s) AND (StartTime > %s);''', [session['user_id'], request.form['endTime'], request.form['startTime']]))

@@ -13,6 +13,7 @@
             <th>Card Number</th>
             <th>Value</th>
             <th>Remove?</th>
+            <th>Add Funds?</th>
         </tr>
     </thead>
     <tbody>
@@ -21,6 +22,7 @@
                 <td>{{ card[0] }}</td>
                 <td>${{ card[1] }}</td>
                 <td><a href="#">Remove</a></td>
+                <td><a href="{{url_for('add_funds', breezecard=card[0])}}">Add Funds</a></td>
             </tr>
         {% endfor %}
     </tbody>
