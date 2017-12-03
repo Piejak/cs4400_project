@@ -58,8 +58,6 @@ def add_funds(breezecard):
     card_info = query_db('''select BreezecardNum, Value from Breezecard where BreezecardNum = %s''', breezecard, one=True)
     if request.method == 'POST':
         #TODO: validate input
-        print(type(request.form['value']))
-        print(type(card_info[1]))
         post_db('''update Breezecard set Value= Value + {} where BreezecardNum={} limit 1'''.format(float(request.form['value']), breezecard))
         return redirect(url_for('user_manage_cards'))
     return render_template('addFunds.html', cardInfo=card_info)
@@ -100,6 +98,16 @@ def suspended_cards():
         return redirect(url_for('home'))
     suspended = query_db('''select Username, Conflict.BreezecardNum, DateTime, BelongsTo from Conflict, Breezecard where Breezecard.BreezecardNum=Conflict.BreezecardNum;;''')
     return render_template('suspendedCards.html', cards=suspended)
+
+@app.route('/assignCard')
+def assign_card():
+    if not g.admin:
+        return redirect(url_for('home'))
+    username = request.args.get('username')
+    breezecard = request.args.get('breezecard')
+    post_db('''update Breezecard set BelongsTo="{}" where BreezecardNum={} limit 1'''.format(username, breezecard))
+    post_db('''delete from Conflict where BreezecardNum={}'''.format(breezecard))
+    return redirect(url_for('suspended_cards'))
 
 @app.route('/cardManagement')
 def card_management():
