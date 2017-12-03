@@ -306,7 +306,7 @@ group by flowIn.startID;
 def station_management():
     if not g.admin:
         return redirect(url_for('home'))
-    return render_template('stationManagement.html', stations=query_db('''select * from Station;'''))
+    return render_template('stationManagement.html', stations=query_db('''select * from Station order by {} {};'''.format((request.args.get('field') if request.args.get('field') else 'Name'), ('asc' if request.args.get('asc') else 'desc'))))
 
 @app.route('/stations/<station>', methods=['GET', 'POST'])
 def station_view(station):
@@ -409,7 +409,7 @@ def register():
                             request.form['username'], request.form['breezeNumber']))
                     else:
                         post_db('''insert into Breezecard values ({}, 0.00, "{}")'''.format(
-                            request.form['username'], session['user_id']))
+                            request.form['breezeNumber'], request.form['username']))
 
             flash('You were successfully registered and can login now')
             return redirect(url_for('login'))

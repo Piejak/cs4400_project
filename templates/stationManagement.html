@@ -13,10 +13,16 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>Station Name</th>
-            <th>Stop ID</th>
-            <th>Fare</th>
-            <th>Status</th>
+            <th>Station Name (<a href="{{ url_for('station_management', field='Name', asc=1) }}">asc</a>/<a href="{{ url_for('station_management', field='Name', asc=0) }}">desc</a>)</th>
+            <th>Stop ID (
+            <a href="{{ url_for('station_management', field='StopID', asc=1) }}">asc</a>/
+            <a href="{{ url_for('station_management', field='StopID', asc=0) }}">desc</a>)</th>
+            <th>Fare (
+            <a href="{{ url_for('station_management', field='EntryFare', asc=1) }}">asc</a>/
+            <a href="{{ url_for('station_management', field='EntryFare', asc=0) }}">desc</a>)</th>
+            <th>Status (
+            <a href="{{ url_for('station_management', field='ClosedStatus', asc=1) }}">asc</a>/
+            <a href="{{ url_for('station_management', field='ClosedStatus', asc=0) }}">desc</a>)</th>
         </tr>
     </thead>
     <tbody>
