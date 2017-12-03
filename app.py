@@ -137,9 +137,62 @@ def card_management():
     if not g.admin:
         return redirect(url_for('home'))
 
-    cards = query_db('''select * from Breezecard;''')
+    cards = query_db(
+        '''select * from Breezecard where BreezecardNum not in (select BreezecardNum from Conflict);''')
     if request.method == 'POST':
-        query_string = '''select * from Breezecard;'''
+        print(request.form.get('suspendedCards'))
+        if not request.form.get('suspendedCards'):
+            query_string = '''select * from Breezecard where BreezecardNum not in (select BreezecardNum from Conflict);'''
+            if request.form['cardNum']:
+                query_string = '''select * from Breezecard where BreezecardNum not in (select BreezecardNum from Conflict) and BreezecardNum={};'''.format(
+                    request.form['cardNum'])
+            elif request.form['owner'] and request.form['startVal'] and request.form['endVal']:
+                query_string = '''select * from Breezecard where BelongsTo="{}" and Value >= {} and Value <= {} and BreezecardNum not in (select BreezecardNum from Conflict);'''.format(
+                    request.form['owner'], request.form['startVal'], request.form['endVal'])
+            elif request.form['owner'] and request.form['endVal']:
+                query_string = '''select * from Breezecard where BelongsTo="{}" and Value <= {} and BreezecardNum not in (select BreezecardNum from Conflict);'''.format(
+                    request.form['owner'], request.form['endVal'])
+            elif request.form['owner'] and request.form['startVal']:
+                query_string = '''select * from Breezecard where BelongsTo="{}" and Value >= {} and BreezecardNum not in (select BreezecardNum from Conflict);'''.format(
+                    request.form['owner'], request.form['startVal'])
+            elif request.form['endVal'] and request.form['startVal']:
+                query_string = '''select * from Breezecard where Value <= {} and Value >= {} and BreezecardNum not in (select BreezecardNum from Conflict);'''.format(
+                    request.form['endVal'], request.form['startVal'])
+            elif request.form['startVal']:
+                query_string = '''select * from Breezecard where Value >= {} and BreezecardNum not in (select BreezecardNum from Conflict);'''.format(
+                    request.form['startVal'])
+            elif request.form['endVal']:
+                query_string = '''select * from Breezecard where Value <= {} and BreezecardNum not in (select BreezecardNum from Conflict);'''.format(
+                    request.form['endVal'])
+            elif request.form['owner']:
+                query_string = '''select * from Breezecard where BelongsTo="{}" and BreezecardNum not in (select BreezecardNum from Conflict);'''.format(
+                    request.form['owner'])
+        else:
+            query_string = '''select * from Breezecard;'''
+            if request.form['cardNum']:
+                query_string = '''select * from Breezecard where BreezecardNum={};'''.format(
+                    request.form['cardNum'])
+            elif request.form['owner'] and request.form['startVal'] and request.form['endVal']:
+                query_string = '''select * from Breezecard where BelongsTo="{}" and Value >= {} and Value <= {};'''.format(
+                    request.form['owner'], request.form['startVal'], request.form['endVal'])
+            elif request.form['owner'] and request.form['endVal']:
+                query_string = '''select * from Breezecard where BelongsTo="{}" and Value <= {};'''.format(
+                    request.form['owner'], request.form['endVal'])
+            elif request.form['owner'] and request.form['startVal']:
+                query_string = '''select * from Breezecard where BelongsTo="{}" and Value >= {};'''.format(
+                    request.form['owner'], request.form['startVal'])
+            elif request.form['endVal'] and request.form['startVal']:
+                query_string = '''select * from Breezecard where Value <= {} and Value >= {};'''.format(
+                    request.form['endVal'], request.form['startVal'])
+            elif request.form['startVal']:
+                query_string = '''select * from Breezecard where Value >= {};'''.format(
+                    request.form['startVal'])
+            elif request.form['endVal']:
+                query_string = '''select * from Breezecard where Value <= {};'''.format(
+                    request.form['endVal'])
+            elif request.form['owner']:
+                query_string = '''select * from Breezecard where BelongsTo="{}";'''.format(
+                    request.form['owner'])
         if request.form['cardNum']:
             query_string = '''select * from Breezecard where BreezecardNum={};'''.format(request.form['cardNum'])
         elif request.form['owner'] and request.form['startVal'] and request.form['endVal']:
