@@ -1,6 +1,7 @@
 import pymysql
 import hashlib
 import random
+from datetime import datetime
 from flask import Flask, render_template, g, request, flash, session, redirect, url_for, abort
 
 SECRET_KEY = b'_5#y2L"F4Q8z\n\xec]/'
@@ -50,11 +51,24 @@ def user_home():
         start_station_name = query_db('''select Name from Station where StopID="{}"'''.format(start_station), one=True)[0]
     return render_template('userHome.html', breezeCards=query_db('''select BreezecardNum, Value from Breezecard where BelongsTo = %s and BreezecardNum not in (select BreezecardNum from Conflict);''', session['user_id']), startStations=start_stations, startStation=start_station_name, endStations=end_stations)
 
-@app.route('/manageCards')
+@app.route('/manageCards', methods=['GET', 'POST'])
 def user_manage_cards():
     if g.admin or not g.user:
         return redirect(url_for('home'))
-    return render_template('userManageCards.html', breezeCards=query_db('''select BreezeCardNum, Value from Breezecard where BelongsTo = %s''', session['user_id']))
+
+    if request.method == 'POST':
+        if request.form['cardNum']:
+            current_holder = query_db('''select BelongsTo from Breezecard where BreezecardNum={}'''.format(request.form['cardNum']), one=True)
+            if current_holder:
+                current_holder = current_holder[0]
+                post_db('''insert into Conflict values ("{}", {}, "{}")'''.format(session['user_id'], request.form['cardNum'], str(datetime.now())))
+            else:
+                in_db = query_db('''select BreezecardNum from Breezecard where BreezecardNum={}'''.format(request.form['cardNum']), one=True)
+                if in_db:
+                    post_db('''update Breezecard set BelongsTo="{}" where BreezecardNum={}'''.format(session['user_id'], request.form['cardNum']))
+                else:
+                    post_db('''insert into Breezecard values ({}, 0.00, "{}")'''.format(request.form['cardNum'], session['user_id']))
+    return render_template('userManageCards.html', breezeCards=query_db('''select BreezeCardNum, Value from Breezecard where BelongsTo = %s and BreezecardNum not in (select BreezecardNum from Conflict);''', session['user_id']))
 
 
 @app.route('/usercards/<breezecard>', methods=['GET', 'POST'])
@@ -89,7 +103,6 @@ def trip_history():
     if g.admin or not g.user:
         return redirect(url_for(home))
     if request.method == 'POST':
-        #TODO: remove suspended breezecards
         if request.form['startTime'] and request.form['endTime']:
             #we have both start and end time
             return render_template('tripHistory.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime < %s) AND (StartTime > %s);''', [session['user_id'], request.form['endTime'], request.form['startTime']]))
@@ -280,6 +293,8 @@ def register():
             error = 'The two passwords do not match'
         elif get_user_id(request.form['username']) is not None:
             error = 'The username is already taken'
+        elif query_db('''select Email from Passenger where Email="{}";'''.format(request.form['email']), one=True):
+            error = 'That email has already been used'
         else:
             post_db('''insert into User (Username, Password, IsAdmin) values (%s, %s, FALSE);''', [request.form['username'], generate_password_hash(request.form['password'])])
             post_db('''insert into Passenger (Username, Email) values (%s, %s)''', [request.form['username'], request.form['email']])
@@ -297,7 +312,37 @@ def register():
                 #they already have a breezecard they want to use
                 #need to lookup breezecards and make sure that the number entered is a card that 1. exists and 2. belongs to no one
                 # if the card belongs to someone, generate a new card and suspend the old one
-                return NotImplementedError
+                current_holder = query_db('''select BelongsTo from Breezecard where BreezecardNum={}'''.format(
+                    request.form['breezeNumber']), one=True)
+                if current_holder:
+                    current_holder = current_holder[0]
+                    post_db('''insert into Conflict values ("{}", {}, "{}")'''.format(
+                        request.form['username'], request.form['breezeNumber'], str(datetime.now())))
+                    
+                    #need to generate a new breezecard number
+                    generated_number = random.randint(
+                        1000000000000000, 9999999999999999)
+                    duplicate = query_db(
+                        '''select BreezecardNum from Breezecard where BreezecardNum = %s''', generated_number)
+                    #keeps generating a new number until we find one that isn't taken
+                    while duplicate:
+                        generated_number = random.randint(
+                            1000000000000000, 9999999999999999)
+                        duplicate = query_db(
+                            '''select BreezecardNum from Breezecard where BreezecardNum = %s''', generated_number)
+                    post_db('''insert into Breezecard values (%s, 0, %s)''', [
+                            generated_number, request.form['username']])
+
+                else:
+                    in_db = query_db('''select BreezecardNum from Breezecard where BreezecardNum={}'''.format(
+                        request.form['breezeNumber']), one=True)
+                    if in_db:
+                        post_db('''update Breezecard set BelongsTo="{}" where BreezecardNum={}'''.format(
+                            request.form['username'], request.form['breezeNumber']))
+                    else:
+                        post_db('''insert into Breezecard values ({}, 0.00, "{}")'''.format(
+                            request.form['username'], session['user_id']))
+
             flash('You were successfully registered and can login now')
             return redirect(url_for('login'))
     return render_template('register.html', error=error)
