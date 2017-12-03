@@ -16,8 +16,18 @@
         </tr>
     </thead>
     <tbody>
-
+        {% for card in breezeCards %}
+            <tr>
+                <td>{{ card[0] }}</td>
+                <td>${{ card[1] }}</td>
+                <td><a href="#">Remove</a></td>
+            </tr>
+        {% endfor %}
     </tbody>
 </table>
+<form class="form-inline">
+    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="number" placeholder="0000 0000 0000 0000">
+    <button type="submit" class="btn btn-primary">Add Card</button>
+</form>
 
 {% endblock %}

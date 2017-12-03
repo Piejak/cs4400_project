@@ -45,7 +45,7 @@ def user_home():
 def user_manage_cards():
     if g.admin or not g.user:
         return redirect(url_for(home))
-    return render_template('userManageCards.html')
+    return render_template('userManageCards.html', breezeCards=query_db('''select BreezeCardNum, Value from Breezecard where BelongsTo = %s''', session['user_id']))
 
 @app.route('/tripHistory')
 def trip_history():
