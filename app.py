@@ -47,7 +47,7 @@ def user_manage_cards():
         return redirect(url_for('home'))
     return render_template('userManageCards.html', breezeCards=query_db('''select BreezeCardNum, Value from Breezecard where BelongsTo = %s''', session['user_id']))
 
-@app.route('/<breezecard>')
+@app.route('/cards/<breezecard>')
 def add_funds(breezecard):
     if not g.user or g.admin:
         return redirect(url_for('home'))
@@ -64,6 +64,7 @@ def trip_history():
     if g.admin or not g.user:
         return redirect(url_for(home))
     if request.method == 'POST':
+        #TODO: remove suspended breezecards
         if request.form['startTime'] and request.form['endTime']:
             #we have both start and end time
             return render_template('tripHistory.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime < %s) AND (StartTime > %s);''', [session['user_id'], request.form['endTime'], request.form['startTime']]))
@@ -122,11 +123,10 @@ def station_management():
         return redirect(url_for('home'))
     return render_template('stationManagement.html', stations=query_db('''select * from Station;'''))
 
-@app.route('/<station>')
+@app.route('/stations/<station>')
 def station_view(station):
     station_info = query_db('''select * from Station where StopID = %s''', station, one=True)
-    if not station_info:
-        abort(404)
+    print(station_info)
     return render_template('stationView.html', station=station_info)
 
 
@@ -139,6 +139,8 @@ def create_station():
         print(request.form)
         #TODO: implement busses and check for valid range of entry fare
         post_db('''insert into Station values (%s, %s, %s, %s, %s);''', [request.form['stopId'], request.form['sName'], request.form['entryFare'], (1 if not request.form.get('isOpen') else 0), (1 if request.form['stationRadio'] == 'train' else 0)])
+        if request.form['stationRadio'] == 'bus':
+            post_db('''insert into BusStationIntersection values (%s, %s)''', [request.form['stopId'], request.form['nearestIntersection']])
         return redirect(url_for('station_management'))
     return render_template('createStation.html')
 
