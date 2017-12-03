@@ -13,9 +13,9 @@
     <div class="form-group">
         <label for="sName" class="col-sm-2 control-label">Breeze Card</label>
         <div class="col-sm-8">
-            <select class="form-control">
+            <select class="form-control" name="card">
                 {% for card in breezeCards %}
-                    <option>{{ card[0] }} - ${{ card[1] }}</option>
+                    <option value="{{ card[0] }}">{{ card[0] }} - ${{ card[1] }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -23,17 +23,17 @@
     <div class="form-group">
         <label for="stopId" class="col-sm-2 control-label">Start at</label>
         <div class="col-sm-8">
-            <select class="form-control">
+            <select class="form-control" name="start">
                 {% if startStation %}
-                    <option>{{startStation}}</option>
+                    <option value="onTrip">{{startStation}}</option>
                 {% else %}
                 {% for station in startStations %}
-                    <option>{{station[0]}} - ${{station[1]}}</option>
+                    <option value="{{ station[2] }}">{{station[0]}} - ${{station[1]}}</option>
                 {% endfor %}
                 {% endif %}
             </select>
         </div>
-         {% if not startStation %}
+        {% if not startStation %}
         <div class="col-sm-2">
             <button type="submit" class="btn btn-primary">Start Trip</button>
         </div>
@@ -42,11 +42,11 @@
     <div class="form-group">
         <label for="entryFare" class="col-sm-2 control-label">Ending at</label>
         <div class="col-sm-8">
-            <select class="form-control">
+            <select class="form-control" name="end">
                  {% if not startStation %}
-                <option>You aren't on a trip</option>
+                <option value="notStarted">You aren't on a trip</option>
                 {% else %} {% for station in endStations %}
-                <option>{{station[0]}}</option>
+                <option value="{{ station[1] }}">{{station[0]}}</option>
                 {% endfor %} {% endif %}
             </select>
         </div>
