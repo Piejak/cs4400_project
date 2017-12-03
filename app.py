@@ -86,13 +86,35 @@ def suspended_cards():
 def card_management():
     if not g.admin:
         return redirect(url_for('home'))
-    return render_template('cardManagement.html')
+    cards = query_db('''select * from Breezecard;''')
+    return render_template('cardManagement.html', cards=cards)
 
 @app.route('/flowReport')
 def flow_report():
     if not g.admin:
         return redirect(url_for('home'))
-    return render_template('flowReport.html')
+    #TODO:implement dates
+    flow = query_db('''
+select distinct (select Name from Station where StopID=flowIn.startID), flowIn.passIn, flowOut.passOut, flowIn.passIn-flowOut.passOut, revenue.money 
+from
+(select StopID as startID, count(startTrip.StartsAt) as passIn
+from Station 
+left join Trip as startTrip
+on (Station.StopID=startTrip.StartsAt)
+group by startID) as flowIn
+join
+(select StopID, count(endTrip.EndsAt) as passOut
+from Station 
+left join Trip as endTrip
+on (Station.StopID=endTrip.EndsAt)
+group by Station.StopID) as flowOut on (flowIn.startID=flowOut.StopID)
+join
+(select StartsAt, sum(Tripfare) as money
+from Trip
+group by Trip.StartsAt) as revenue on (flowIn.startID=revenue.StartsAt)
+group by flowIn.startID;
+''')
+    return render_template('flowReport.html', flows=flow)
 
 @app.route("/stationManagement")
 def station_management():
