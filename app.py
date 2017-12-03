@@ -39,7 +39,16 @@ def home():
 def user_home():
     if g.admin or not g.user:
         return redirect(url_for('home'))
-    return render_template('userHome.html', breezeCards=query_db('''select BreezeCardNum, Value from Breezecard where BelongsTo = %s''', session['user_id']))
+    start_stations = query_db('''select Name, EnterFare from Station;''')
+    onTrip = '''select StartsAt from Trip where BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo="{}") and EndsAt is NULL'''.format(session['user_id'])
+    start_station = query_db(onTrip, one=True)
+    start_station_name = None
+    end_stations = None
+    if start_station:
+        start_station = start_station[0]
+        end_stations = query_db('''select Name from Station where IsTrain=(select IsTrain from Station where StopID="{}")'''.format(start_station))
+        start_station_name = query_db('''select Name from Station where StopID="{}"'''.format(start_station), one=True)[0]
+    return render_template('userHome.html', breezeCards=query_db('''select BreezecardNum, Value from Breezecard where BelongsTo = %s and BreezecardNum not in (select BreezecardNum from Conflict);''', session['user_id']), startStations=start_stations, startStation=start_station_name, endStations=end_stations)
 
 @app.route('/manageCards')
 def user_manage_cards():
@@ -109,11 +118,32 @@ def assign_card():
     post_db('''delete from Conflict where BreezecardNum={}'''.format(breezecard))
     return redirect(url_for('suspended_cards'))
 
-@app.route('/cardManagement')
+
+@app.route('/cardManagement', methods=['GET', 'POST'])
 def card_management():
     if not g.admin:
         return redirect(url_for('home'))
+
     cards = query_db('''select * from Breezecard;''')
+    if request.method == 'POST':
+        query_string = '''select * from Breezecard;'''
+        if request.form['cardNum']:
+            query_string = '''select * from Breezecard where BreezecardNum={};'''.format(request.form['cardNum'])
+        elif request.form['owner'] and request.form['startVal'] and request.form['endVal']:
+            query_string = '''select * from Breezecard where BelongsTo="{}" and Value >= {} and Value <= {};'''.format(request.form['owner'], request.form['startVal'], request.form['endVal'])
+        elif request.form['owner'] and request.form['endVal']:
+            query_string ='''select * from Breezecard where BelongsTo="{}" and Value <= {};'''.format(request.form['owner'], request.form['endVal'])
+        elif request.form['owner'] and request.form['startVal']:
+            query_string = '''select * from Breezecard where BelongsTo="{}" and Value >= {};'''.format(request.form['owner'], request.form['startVal'])
+        elif request.form['endVal'] and request.form['startVal']:
+            query_string = '''select * from Breezecard where Value <= {} and Value >= {};'''.format(request.form['endVal'], request.form['startVal'])
+        elif request.form['startVal']:
+            query_string = '''select * from Breezecard where Value >= {};'''.format(request.form['startVal'])
+        elif request.form['endVal']:
+            query_string = '''select * from Breezecard where Value <= {};'''.format(request.form['endVal'])
+        elif request.form['owner']:
+            query_string = '''select * from Breezecard where BelongsTo="{}";'''.format(request.form['owner']) 
+        cards = query_db(query_string)
     return render_template('cardManagement.html', cards=cards)
 
 @app.route('/admincards/<breezecard>', methods=['GET', 'POST'])
@@ -128,7 +158,8 @@ def admin_card_view(breezecard):
         return redirect(url_for('card_management'))
     return render_template('adminCardView.html', cardInfo=card_info)
 
-@app.route('/flowReport')
+
+@app.route('/flowReport', methods=['GET', 'POST'])
 def flow_report():
     if not g.admin:
         return redirect(url_for('home'))
@@ -153,6 +184,41 @@ from Trip
 group by Trip.StartsAt) as revenue on (flowIn.startID=revenue.StartsAt)
 group by flowIn.startID;
 ''')
+
+    if request.method == 'POST':
+        if request.form['startTime'] and request.form['endTime']:
+            #we have both start and end time
+            query_statement = '''
+select distinct (select Name from Station where StopID=flowIn.startID), flowIn.passIn, flowOut.passOut, flowIn.passIn-flowOut.passOut, revenue.money 
+from
+(select StopID as startID, count(startTrip.StartsAt) as passIn, StartTime
+from Station 
+left join Trip as startTrip
+on (Station.StopID=startTrip.StartsAt and startTrip.StartTime < "{}" and startTrip.StartTime > "{}")
+group by startID) as flowIn
+join
+(select StopID, count(endTrip.EndsAt) as passOut, StartTime
+from Station 
+left join Trip as endTrip
+on (Station.StopID=endTrip.EndsAt and endTrip.StartTime < "{}" and endTrip.StartTime > "{}")
+group by Station.StopID) as flowOut on (flowIn.startID=flowOut.StopID)
+join
+(select StartsAt, sum(Tripfare) as money
+from Trip
+where (Trip.StartTime < "{}" and Trip.StartTime > "{}")
+group by Trip.StartsAt) as revenue on (flowIn.startID=revenue.StartsAt)
+group by flowIn.startID;
+'''.format(request.form['endTime'], request.form['startTime'], request.form['endTime'], request.form['startTime'], request.form['endTime'], request.form['startTime'])
+            print(query_statement)
+            flow = query_db(query_statement)
+            return render_template('flowReport.html', flows=flow)
+        elif request.form['startTime']:
+            #we just have start time
+            return render_template('flowReport.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime > %s);''', [session['user_id'], request.form['startTime']]))
+        elif request.form['endTime']:
+            #we just have end time
+            return render_template('flowReport.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime < %s);''', [session['user_id'], request.form['endTime']]))
+
     return render_template('flowReport.html', flows=flow)
 
 @app.route("/stationManagement")

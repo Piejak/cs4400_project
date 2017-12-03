@@ -24,23 +24,37 @@
         <label for="stopId" class="col-sm-2 control-label">Start at</label>
         <div class="col-sm-8">
             <select class="form-control">
-                <option>Default select</option>
+                {% if startStation %}
+                    <option>{{startStation}}</option>
+                {% else %}
+                {% for station in startStations %}
+                    <option>{{station[0]}} - ${{station[1]}}</option>
+                {% endfor %}
+                {% endif %}
             </select>
         </div>
+         {% if not startStation %}
         <div class="col-sm-2">
-            <button type="submit" class="btn btn-default">Start Trip</button>
+            <button type="submit" class="btn btn-primary">Start Trip</button>
         </div>
+        {% endif %}
     </div>
     <div class="form-group">
         <label for="entryFare" class="col-sm-2 control-label">Ending at</label>
         <div class="col-sm-8">
             <select class="form-control">
-                <option>Default select</option>
+                 {% if not startStation %}
+                <option>You aren't on a trip</option>
+                {% else %} {% for station in endStations %}
+                <option>{{station[0]}}</option>
+                {% endfor %} {% endif %}
             </select>
         </div>
+        {% if startStation %}
         <div class="col-sm-2">
-            <button type="submit" class="btn btn-default">End Trip</button>
+            <button type="submit" class="btn btn-primary">End Trip</button>
         </div>
+        {% endif %}
     </div>
 </form>
 
