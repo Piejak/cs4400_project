@@ -79,7 +79,8 @@ def trip_history():
 def suspended_cards():
     if not g.admin:
         return redirect(url_for('home'))
-    return render_template('stationManagement.html', stations=query_db('''select * from Station;'''))
+    suspended = query_db('''select Username, Conflict.BreezecardNum, DateTime, BelongsTo from Conflict, Breezecard where Breezecard.BreezecardNum=Conflict.BreezecardNum;;''')
+    return render_template('suspendedCards.html', cards=suspended)
 
 @app.route('/cardManagement')
 def card_management():

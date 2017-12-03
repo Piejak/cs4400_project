@@ -1,8 +1,5 @@
 {% extends "layout.html" %} {% block title %}Suspended Cards{% endblock %} {% block body %}
-<h2>Suspended Cards
-    <a href="{{url_for('create_station')}}" class="btn btn-default">Add Selected Card to New Owner</a>
-    <a href="{{url_for('create_station')}}" class="btn btn-default">Add Selected Card to Old Owner</a>
-</h2>
+<h2>Suspended Cards</h2>
 
 {% if error %}
 <div class="error">
@@ -17,19 +14,19 @@
             <th>New Owner</th>
             <th>Date Suspended</th>
             <th>Previous Owner</th>
+            <th>Assign to New Owner</th>
+            <th>Assign to Previous Owner</th>
         </tr>
     </thead>
     <tbody>
-        {% for station in stations %}
+        {% for card in cards %}
         <tr>
-            <td>{{station[1]}}</td>
-            <td>{{station[0]}}</td>
-            <td>${{station[2]}}</td>
-            {% if station[3] %}
-            <td>Closed</td>
-            {% else %}
-            <td>Open</td>
-            {% endif %}
+            <td>{{card[1]}}</td>
+            <td>{{card[0]}}</td>
+            <td>{{card[2]}}</td>
+            <td>{{card[3]}}</td>
+            <td><a href="#">Assign to {{card[0]}}</a></td>
+            <td><a href="#">Assign to {{card[3]}}</a></td>
         </tr>
         {% endfor %}
     </tbody>
