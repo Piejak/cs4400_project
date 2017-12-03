@@ -112,6 +112,11 @@ def create_station():
     if not g.admin:
         error = 'You must be an admin to view this page'
         return redirect(url_for('home'))
+    if request.method == 'POST':
+        print(request.form)
+        #TODO: implement busses and check for valid range of entry fare
+        post_db('''insert into Station values (%s, %s, %s, %s, %s);''', [request.form['stopId'], request.form['sName'], request.form['entryFare'], (1 if not request.form.get('isOpen') else 0), (1 if request.form['stationRadio'] == 'train' else 0)])
+        return redirect(url_for('station_management'))
     return render_template('createStation.html')
 
 @app.route("/welcome")
@@ -127,8 +132,7 @@ def register():
     if request.method == 'POST':
         if not request.form['username']:
             error = 'You have to enter a username'
-        elif not request.form['email'] or \
-                '@' not in request.form['email']:
+        elif not request.form['email'] or '@' not in request.form['email']:
             error = 'You have to enter a valid email address'
         elif not request.form['password']:
             error = 'You have to enter a password'
