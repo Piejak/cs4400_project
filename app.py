@@ -1,7 +1,7 @@
 import pymysql
 import hashlib
 import random
-from flask import Flask, render_template, g, request, flash, session, redirect, url_for
+from flask import Flask, render_template, g, request, flash, session, redirect, url_for, abort
 
 SECRET_KEY = b'_5#y2L"F4Q8z\n\xec]/'
 app = Flask(__name__)
@@ -47,11 +47,22 @@ def user_manage_cards():
         return redirect(url_for(home))
     return render_template('userManageCards.html', breezeCards=query_db('''select BreezeCardNum, Value from Breezecard where BelongsTo = %s''', session['user_id']))
 
-@app.route('/tripHistory')
-def trip_history():
+@app.route('/tripHistory', methods=['GET', 'POST'])
+def trip_history(startTime=None, endTime=None):
     if g.admin or not g.user:
         return redirect(url_for(home))
-    return render_template('tripHistory.html')
+    if request.method == 'POST':
+        print(request.form['startTime'], ' ', request.form['endTime'])
+        if request.form['startTime'] and request.form['endTime']:
+            #we have both start and end time
+            return render_template('tripHistory.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime < %s) AND (StartTime > %s);''', [session['user_id'], request.form['endTime'], request.form['startTime']]))
+        elif request.form['startTime']:
+            #we just have start time
+            return render_template('tripHistory.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime > %s);''', [session['user_id'], request.form['startTime']]))
+        elif request.form['endTime']:
+            #we just have end time
+            return render_template('tripHistory.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime < %s);''', [session['user_id'], request.form['endTime']]))
+    return render_template('tripHistory.html', trips=query_db('''select * from Trip where BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)''', session['user_id']))
 
 @app.route("/suspendedCards")
 def suspended_cards():

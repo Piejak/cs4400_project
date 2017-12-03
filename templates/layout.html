@@ -7,56 +7,51 @@
     crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
     crossorigin="anonymous"></script>
-<nav class="navbar navbar-default">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
-                aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="{{ url_for('home') }}">Marta</a>
-        </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-                {% if g.admin %}
-                <li>
-                    <a href="{{ url_for('station_management') }}">Station Management</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('suspended_cards') }}">Suspended Cards</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('card_management') }}">Breeze Card Management</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('flow_report') }}">Passenger Flow Report</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('logout') }}">Sign Out {{ g.user[0] }}</a>
-                </li>
-                {% elif g.user %}
-                <li>
-                    <a href="{{ url_for('user_manage_cards') }}">Manage Cards</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('trip_history') }}">Trip History</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('logout') }}">Sign Out {{ g.user[0] }}</a>
-                </li>
-                {% else %}
-                <li>
-                    <a href="{{ url_for('login') }}">Sign In</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('register') }}">Register</a>
-                </li>
-                {% endif %}
-            </ul>
-        </div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Marta</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+        aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            {% if g.admin %}
+            <li class="nav-item">
+                <a href="{{ url_for('station_management') }}" class="nav-link">Station Management</a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('suspended_cards') }}" class="nav-link">Suspended Cards</a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('card_management') }}" class="nav-link">Breeze Card Management</a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('flow_report') }}" class="nav-link">Passenger Flow Report</a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('logout') }}" class="nav-link">Sign Out {{ g.user[0] }}</a>
+            </li>
+            {% elif g.user %}
+            <li class="nav-item">
+                <a href="{{ url_for('user_manage_cards') }}" class="nav-link">Manage Cards</a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('trip_history') }}" class="nav-link">Trip History</a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('logout') }}" class="nav-link">Sign Out {{ g.user[0] }}</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a href="{{ url_for('login') }}" class="nav-link">Sign In</a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('register') }}" class="nav-link">Register</a>
+            </li>
+            {% endif %}
+        </ul>
     </div>
 </nav>
 
