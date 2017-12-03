@@ -47,17 +47,35 @@ def user_manage_cards():
         return redirect(url_for('home'))
     return render_template('userManageCards.html', breezeCards=query_db('''select BreezeCardNum, Value from Breezecard where BelongsTo = %s''', session['user_id']))
 
-@app.route('/cards/<breezecard>')
+
+@app.route('/usercards/<breezecard>', methods=['GET', 'POST'])
 def add_funds(breezecard):
     if not g.user or g.admin:
         return redirect(url_for('home'))
-    print(query_db(
-        '''select BelongsTo from Breezecard where BreezecardNum = %s''', breezecard, one=True)[0])
     if query_db('''select BelongsTo from Breezecard where BreezecardNum = %s''', breezecard, one=True)[0] != session['user_id']:
         #if the breezecard doesnt belong to the logged in user
         return redirect(url_for('home'))
     card_info = query_db('''select BreezecardNum, Value from Breezecard where BreezecardNum = %s''', breezecard, one=True)
+    if request.method == 'POST':
+        #TODO: validate input
+        print(type(request.form['value']))
+        print(type(card_info[1]))
+        post_db('''update Breezecard set Value= Value + {} where BreezecardNum={} limit 1'''.format(float(request.form['value']), breezecard))
+        return redirect(url_for('user_manage_cards'))
     return render_template('addFunds.html', cardInfo=card_info)
+
+@app.route('/cardDelete/<breezecard>')
+def delete_card(breezecard):
+    if not g.user or g.admin:
+        return redirect(url_for('home'))
+    if query_db('''select BelongsTo from Breezecard where BreezecardNum = %s''', breezecard, one=True)[0] != session['user_id']:
+        #if the breezecard doesnt belong to the logged in user
+        return redirect(url_for('home'))
+    number_cards = query_db('''select count(BreezecardNum) from Breezecard where BelongsTo=%s group by BelongsTo''', session['user_id'], one=True)[0]
+    if number_cards == 1:
+        return redirect(url_for('user_manage_cards'))
+    post_db('''update Breezecard set BelongsTo=NULL where BreezecardNum=%s limit 1''', breezecard)
+    return redirect(url_for('user_manage_cards'))
 
 @app.route('/tripHistory', methods=['GET', 'POST'])
 def trip_history():
@@ -89,6 +107,18 @@ def card_management():
         return redirect(url_for('home'))
     cards = query_db('''select * from Breezecard;''')
     return render_template('cardManagement.html', cards=cards)
+
+@app.route('/admincards/<breezecard>', methods=['GET', 'POST'])
+def admin_card_view(breezecard):
+    if not g.admin:
+        return redirect(url_for('home'))
+    card_info = query_db(
+        '''select * from Breezecard where BreezecardNum = %s''', breezecard, one=True)
+    if request.method == 'POST':
+        #TODO: validate input
+        post_db('''update Breezecard set Value=%s, BelongsTo=%s where BreezecardNum=%s limit 1''', [(request.form['value'] if request.form['value'] else card_info[1]), (request.form['username'] if request.form['username'] else card_info[2]), breezecard])
+        return redirect(url_for('card_management'))
+    return render_template('adminCardView.html', cardInfo=card_info)
 
 @app.route('/flowReport')
 def flow_report():

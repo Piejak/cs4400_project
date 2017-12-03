@@ -1,5 +1,5 @@
-{% extends "layout.html" %} {% block title %}Add Funds{% endblock %} {% block body %}
-<h2>Add Funds</h2>
+{% extends "layout.html" %} {% block title %}Admin Card View{% endblock %} {% block body %}
+<h2>Admin Card View</h2>
 <p>Card #: {{cardInfo[0]}}</p>
 <p>Current balance: ${{ cardInfo[1] }}</p>
 {% if error %}
@@ -10,17 +10,16 @@
 
 <form action="" method="post">
     <div class="form-group">
-        <label for="cardNum">Credit Card #</label>
-        <input type="text" name="cardNum" size="30" placeholder="00000000000000000" class="form-control"
-            id="cardNum">
+        <label for="username">Assign to User</label>
+        <input type="text" name="username" size="30" placeholder="{{ cardInfo[2] }}" class="form-control" id="username">
     </div>
     <div class="form-group">
-        <label for="value">Amount to Add</label>
+        <label for="value">Set Value</label>
         <div class="input-group">
             <div class="input-group-addon">$</div>
             <input type="text" name="value" size="30" placeholder="0.00" class="form-control" id="value">
         </div>
     </div>
-    <input type="submit" value="Add Funds" class="btn btn-primary">
+    <input type="submit" value="Update Card" class="btn btn-primary">
 </form>
 {% endblock %}

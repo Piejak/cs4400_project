@@ -21,8 +21,8 @@
             <tr>
                 <td>{{ card[0] }}</td>
                 <td>${{ card[1] }}</td>
-                <td><a href="#">Remove</a></td>
-                <td><a href="{{url_for('add_funds', breezecard=card[0])}}">Add Funds</a></td>
+                <td><a href="{{ url_for('delete_card', breezecard=card[0]) }}">Remove</a></td>
+                <td><a href="{{ url_for('add_funds', breezecard=card[0]) }}">Add Funds</a></td>
             </tr>
         {% endfor %}
     </tbody>

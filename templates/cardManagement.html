@@ -66,7 +66,7 @@
         {% for card in cards %}
         <tr>
             <td>
-                <a href="#">{{card[0]}}</a>
+                <a href="{{ url_for('admin_card_view', breezecard=card[0]) }}">{{card[0]}}</a>
             </td>
             <td>${{card[1]}}</td>
             <td>{{card[2]}}</td>
