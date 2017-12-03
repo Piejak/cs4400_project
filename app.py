@@ -123,11 +123,23 @@ def station_management():
         return redirect(url_for('home'))
     return render_template('stationManagement.html', stations=query_db('''select * from Station;'''))
 
-@app.route('/stations/<station>')
+@app.route('/stations/<station>', methods=['GET', 'POST'])
 def station_view(station):
+    if not g.admin:
+        return redirect(url_for('home'))
     station_info = query_db('''select * from Station where StopID = %s''', station, one=True)
-    print(station_info)
-    return render_template('stationView.html', station=station_info)
+    if not station_info:
+        abort(404)
+    intersection = None
+    if not station_info[4]:
+        #this is a bus so we need the intersection
+        intersection = query_db('''select Intersection from BusStationIntersection where StopID=%s''', station, one=True)
+
+    if request.method == 'POST':
+        # TODO: validate the input
+        post_db('''update Station set EnterFare = %s, ClosedStatus=%s where StopID = %s limit 1''', [(station_info[2] if not request.form['entryFare'] else request.form['entryFare']), (1 if not request.form.get('isOpen') else 0), station])
+        return redirect(url_for('station_management'))
+    return render_template('stationView.html', station=station_info, intersection=intersection)
 
 
 @app.route("/createStation", methods=['GET', 'POST'])
@@ -136,8 +148,7 @@ def create_station():
         error = 'You must be an admin to view this page'
         return redirect(url_for('home'))
     if request.method == 'POST':
-        print(request.form)
-        #TODO: implement busses and check for valid range of entry fare
+        #TODO: check for valid range of entry fare
         post_db('''insert into Station values (%s, %s, %s, %s, %s);''', [request.form['stopId'], request.form['sName'], request.form['entryFare'], (1 if not request.form.get('isOpen') else 0), (1 if request.form['stationRadio'] == 'train' else 0)])
         if request.form['stationRadio'] == 'bus':
             post_db('''insert into BusStationIntersection values (%s, %s)''', [request.form['stopId'], request.form['nearestIntersection']])

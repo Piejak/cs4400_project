@@ -1,7 +1,6 @@
 {% extends "layout.html" %} {% block title %}Station View{% endblock %} {% block body %}
-<h2>Station View - {{ station[1] }}</h2>
-<p>Stop {{ station[0] }}</p>
-<p>{{ station }}</p>
+<h2>Station View: {{ station[1] }}</h2>
+<h6>Stop {{ station[0] }}</h6>
 
 {% if error %}
 <div class="error">
@@ -9,16 +8,32 @@
 </div>
 {% endif %}
 
-<form class="form-inline">
+<form class="form-horizontal" method="post">
     <label for="entryFare" class="col-sm-2 control-label">Entry Fare</label>
     <div class="input-group">
         <div class="input-group-addon">$</div>
         <input type="text" name="entryFare" size="30" placeholder="{{ station[2] }}" id="entryFare" class="form-control">
     </div>
+    <div class="form-check">
+        <div class="col-sm-offset-2 col-sm-10">
+            <label>
+                {% if station[3] %}
+                <input type="checkbox" class="form-check-input" name="isOpen"> Open Station
+                {% else %}
+                <input type="checkbox" class="form-check-input" name="isOpen" checked> Open Station
+                {% endif %}
+                <small>(when checked, passengers can enter this station)</small>
+            </label>
+        </div>
+    </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary">Update Fare</button>
+        <button type="submit" class="btn btn-primary">Update Station</button>
     </div>
 </form>
+{% if intersection %}
+<p>Nearest intersection: {{ intersection[0] }}</p>
+{% else %}
 <p>Nearest intersection - Not available for train stations</p>
+{% endif %}
 
 {% endblock %}
