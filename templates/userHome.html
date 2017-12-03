@@ -11,52 +11,35 @@
 
 <form action="" method="post" class="form-horizontal">
     <div class="form-group">
-        <label for="sName" class="col-sm-2 control-label">Station Name</label>
-        <div class="col-sm-10">
-            <input type="text" name="sName" size="30" value="{{ request.form.sName }}" placeholder="Station Name" id="sName" class="form-control">
+        <label for="sName" class="col-sm-2 control-label">Breeze Card</label>
+        <div class="col-sm-8">
+            <select class="form-control">
+                {% for card in breezeCards %}
+                    <option>{{ card[0] }} - ${{ card[1] }}</option>
+                {% endfor %}
+            </select>
         </div>
     </div>
     <div class="form-group">
-        <label for="stopId" class="col-sm-2 control-label">Stop ID</label>
-        <div class="col-sm-10">
-            <input type="text" name="stopId" size="30" value="{{ request.form.stopId }}" placeholder="Stop ID" id="stopId" class="form-control">
+        <label for="stopId" class="col-sm-2 control-label">Start at</label>
+        <div class="col-sm-8">
+            <select class="form-control">
+                <option>Default select</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <button type="submit" class="btn btn-default">Start Trip</button>
         </div>
     </div>
     <div class="form-group">
-        <label for="entryFare" class="col-sm-2 control-label">Entry Fare</label>
-        <div class="col-sm-10">
-            <div class="input-group">
-                <div class="input-group-addon">$</div>
-                <input type="text" name="entryFare" size="30" placeholder="0.00" id="entryFare" class="form-control">
-            </div>
+        <label for="entryFare" class="col-sm-2 control-label">Ending at</label>
+        <div class="col-sm-8">
+            <select class="form-control">
+                <option>Default select</option>
+            </select>
         </div>
-    </div>
-    <!-- station type radios -->
-    <div class="form-group">
-        <label for="busStation" class="col-sm-2 control-label">Station Type</label>
-        <div class="col-sm-10">
-            <div class="radio" id="busStation">
-                <label>
-                    <input type="radio" name="stationRadio" id="busRadio" value="bus"> Bus Station
-                </label>
-            </div>
-            <label for="nearestIntersection">
-                <small>Nearest Intersection (Bus Station only)</small>
-            </label>
-            <input type="text" name="nearestIntersection" size="30" placeholder="Nearest Intersection" id="nearestIntersection" class="form-control">
-        </div>
-
-        <div class="col-sm-offset-2 col-sm-10">
-            <div class="radio" id="trainStation">
-                <label>
-                    <input type="radio" name="stationRadio" id="trainRadio" value="train"> Train Station
-                </label>
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-default">Create Station</button>
+        <div class="col-sm-2">
+            <button type="submit" class="btn btn-default">End Trip</button>
         </div>
     </div>
 </form>

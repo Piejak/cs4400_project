@@ -39,7 +39,7 @@ def home():
 def user_home():
     if g.admin or not g.user:
         return redirect(url_for(home))
-    return render_template('userHome.html')
+    return render_template('userHome.html', breezeCards=query_db('''select BreezeCardNum, Value from Breezecard where BelongsTo = %s''', session['user_id']))
 
 @app.route('/manageCards')
 def user_manage_cards():
