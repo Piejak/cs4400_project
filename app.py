@@ -1,6 +1,7 @@
 import pymysql
 import hashlib
 import random
+import re
 from datetime import datetime
 from flask import Flask, render_template, g, request, flash, session, redirect, url_for, abort
 
@@ -338,7 +339,7 @@ def register():
     if request.method == 'POST':
         if not request.form['username']:
             error = 'You have to enter a username'
-        elif not request.form['email'] or '@' not in request.form['email']:
+        elif not request.form['email'] or '@' not in request.form['email'] or not re.search(r'[\w.-]+@[\w.-]+.\w+', request.form['email']):
             error = 'You have to enter a valid email address'
         elif not request.form['password']:
             error = 'You have to enter a password'
