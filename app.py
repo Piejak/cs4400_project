@@ -218,13 +218,26 @@ def card_management():
 def admin_card_view(breezecard):
     if not g.admin:
         return redirect(url_for('home'))
+    error = None
     card_info = query_db(
         '''select * from Breezecard where BreezecardNum = %s''', breezecard, one=True)
     if request.method == 'POST':
         #TODO: validate input
-        post_db('''update Breezecard set Value=%s, BelongsTo=%s where BreezecardNum=%s limit 1''', [(request.form['value'] if request.form['value'] else card_info[1]), (request.form['username'] if request.form['username'] else card_info[2]), breezecard])
-        return redirect(url_for('card_management'))
-    return render_template('adminCardView.html', cardInfo=card_info)
+        try:
+            float((request.form['value'] if request.form['value'] else card_info[1]))
+        except Exception:
+            error = 'Enter a number for the card value'
+            return render_template('adminCardView.html', cardInfo=card_info, error=error)
+
+        if float((request.form['value'] if request.form['value'] else card_info[1])) > 1000 or float((request.form['value'] if request.form['value'] else card_info[1])) < 0:
+            error = 'Enter a valid value'
+        elif get_user_id(request.form['username']) is None:
+            error = 'That user does not exist'
+        else:
+            post_db('''update Breezecard set Value=%s, BelongsTo=%s where BreezecardNum=%s limit 1''', [(request.form['value'] if request.form['value'] else card_info[1]), (request.form['username'] if request.form['username'] else card_info[2]), breezecard])
+            return redirect(url_for('card_management'))            
+        
+    return render_template('adminCardView.html', cardInfo=card_info, error=error)
 
 
 @app.route('/flowReport', methods=['GET', 'POST'])
