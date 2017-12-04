@@ -1,11 +1,15 @@
 {% extends "layout.html" %} {% block title %}Add Funds{% endblock %} {% block body %}
 <h2>Add Funds</h2>
-<p>Card #: {{cardInfo[0]}}</p>
-<p>Current balance: ${{ cardInfo[1] }}</p>
+
 {% if error %}
 <div class="alert alert-danger" role="alert">
-    {{ error }}</div>
+    {{ error }}
+</div>
 {% endif %}
+
+<p>Card #: {{cardInfo[0]}}</p>
+<p>Current balance: ${{ cardInfo[1] }}</p>
+
 
 
 <form action="" method="post">

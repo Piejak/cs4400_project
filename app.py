@@ -89,7 +89,7 @@ def add_funds(breezecard):
         if not request.form['cardNum'].isnumeric() or len(request.form['cardNum']) != 16:
             error = 'Invalid credit card number'
         elif not new_val.isnumeric():
-            error = 'Additional funds must a decimal'
+            error = 'Additional funds must be a decimal'
         elif float(new_val) + float(old_val) > 1000:
             error = 'New card value cannot exceed $1000.00'
         else:
@@ -400,7 +400,7 @@ def station_view(station):
         intersection = query_db('''select Intersection from BusStationIntersection where StopID=%s''', station, one=True)
 
     if request.method == 'POST':
-
+        error=None
         if re.match("^\d+?\.\d+?$", request.form['entryFare']) is None:
             error = 'Entry Fare must a decimal'
         elif float(request.form['entryFare']) < 0 or float(request.form['entryFare']) > 50:
@@ -408,7 +408,7 @@ def station_view(station):
         else:
             post_db('''update Station set EnterFare = %s, ClosedStatus=%s where StopID = %s limit 1''', [(station_info[2] if not request.form['entryFare'] else request.form['entryFare']), (1 if not request.form.get('isOpen') else 0), station])
             return redirect(url_for('station_management'))
-        return render_template('stationView.html',station=station_info, error = error)
+        return render_template('stationView.html',station=station_info, error=error, intersection=intersection)
     return render_template('stationView.html', station=station_info, intersection=intersection)
 
 
