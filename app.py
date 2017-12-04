@@ -37,19 +37,34 @@ def home():
     else:
         return redirect(url_for('login'))
 
-@app.route("/userHome")
+
+@app.route("/userHome", methods=['GET', 'POST'])
 def user_home():
     if g.admin or not g.user:
         return redirect(url_for('home'))
-    start_stations = query_db('''select Name, EnterFare from Station;''')
+    start_stations = query_db('''select Name, EnterFare, StopID from Station;''')
     onTrip = '''select StartsAt from Trip where BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo="{}") and EndsAt is NULL'''.format(session['user_id'])
     start_station = query_db(onTrip, one=True)
     start_station_name = None
     end_stations = None
     if start_station:
         start_station = start_station[0]
-        end_stations = query_db('''select Name from Station where IsTrain=(select IsTrain from Station where StopID="{}")'''.format(start_station))
+        end_stations = query_db('''select Name, StopID from Station where IsTrain=(select IsTrain from Station where StopID="{}")'''.format(start_station))
         start_station_name = query_db('''select Name from Station where StopID="{}"'''.format(start_station), one=True)[0]
+    if request.method == 'POST':
+        print(request.form['start'])
+        if request.form['start'] != 'onTrip':
+            #we haven't started a trip yet
+            #TODO: check to make sure there's enough money
+            post_db('''insert into Trip values ((select EnterFare from Station where StopID="{}"), "{}", {}, "{}", NULL);'''.format(
+                request.form['start'], datetime.now(), request.form['card'], request.form['start']))
+            post_db(
+            '''update Breezecard set Value= Value - (select EnterFare from Station where StopID="{}") where BreezecardNum={} limit 1'''.format(request.form['start'], request.form['card']))
+            return redirect(url_for('home'))
+        else:
+            #we are on a trip
+            post_db('''update Trip set EndsAt="{}" where BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo="{}") and EndsAt is NULL'''.format(request.form['end'] ,session['user_id']))
+            return redirect(url_for('home'))
     return render_template('userHome.html', breezeCards=query_db('''select BreezecardNum, Value from Breezecard where BelongsTo = %s and BreezecardNum not in (select BreezecardNum from Conflict);''', session['user_id']), startStations=start_stations, startStation=start_station_name, endStations=end_stations)
 
 @app.route('/manageCards', methods=['GET', 'POST'])
@@ -266,7 +281,7 @@ def admin_card_view(breezecard):
 
         if float((request.form['value'] if request.form['value'] else card_info[1])) > 1000 or float((request.form['value'] if request.form['value'] else card_info[1])) < 0:
             error = 'Enter a valid value'
-        elif get_user_id(request.form['username']) is None:
+        elif request.form['username'] and get_user_id(request.form['username']) is None:
             error = 'That user does not exist'
         elif query_db('''select Username from User where Username="{}" and IsAdmin=TRUE'''.format(request.form['username'])):
             error = 'You cannot assign a Breezecard to an Admin'
