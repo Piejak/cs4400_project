@@ -31,7 +31,9 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>Time</th>
+            <th>Time (
+            <a href="{{ url_for('trip_history', field='StartTime', asc=1) }}">asc</a>/
+            <a href="{{ url_for('trip_history', field='StartTime', asc=0) }}">desc</a>)</th>
             <th>Source</th>
             <th>Destination</th>
             <th>Fare Paid</th>

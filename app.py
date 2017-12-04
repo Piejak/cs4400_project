@@ -106,14 +106,14 @@ def trip_history():
     if request.method == 'POST':
         if request.form['startTime'] and request.form['endTime']:
             #we have both start and end time
-            return render_template('tripHistory.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime < %s) AND (StartTime > %s);''', [session['user_id'], request.form['endTime'], request.form['startTime']]))
+            return render_template('tripHistory.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = "{}")) AND (StartTime < "{}") AND (StartTime > "{}") order by StartTime {};'''.format(session['user_id'], request.form['endTime'], request.form['startTime'], ('asc' if request.args.get('asc') != '0' else 'desc'))))
         elif request.form['startTime']:
             #we just have start time
-            return render_template('tripHistory.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime > %s);''', [session['user_id'], request.form['startTime']]))
+            return render_template('tripHistory.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = "{}")) AND (StartTime > "{}") order by StartTime {};'''.format(session['user_id'], request.form['startTime'], ('asc' if request.args.get('asc') != '0' else 'desc'))))
         elif request.form['endTime']:
             #we just have end time
-            return render_template('tripHistory.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime < %s);''', [session['user_id'], request.form['endTime']]))
-    return render_template('tripHistory.html', trips=query_db('''select * from Trip where BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)''', session['user_id']))
+            return render_template('tripHistory.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = "{}")) AND (StartTime < "{}") order by StartTime {};'''.format(session['user_id'], request.form['endTime'], ('asc' if request.args.get('asc') != '0' else 'desc'))))
+    return render_template('tripHistory.html', trips=query_db('''select * from Trip where BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo="{}") order by StartTime {};'''.format(session['user_id'], ('asc' if request.args.get('asc') != '0' else 'desc'))))
 
 @app.route("/suspendedCards")
 def suspended_cards():
