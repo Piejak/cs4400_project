@@ -142,7 +142,30 @@ def card_management():
     cards = query_db(
         '''select * from Breezecard where BreezecardNum not in (select BreezecardNum from Conflict);''')
     if request.method == 'POST':
-        print(request.form.get('suspendedCards'))
+        error = None
+        if request.form['cardNum']:
+            try:
+                int(request.form['cardNum'])
+            except:
+                error = 'Looks like the card number is not a number'
+                return render_template('cardManagement.html', cards=cards, error=error)
+
+            if len(request.form['cardNum']) != 16:
+                error = 'That card number is not the right length'
+                return render_template('cardManagement.html', cards=cards, error=error)
+        if request.form['startVal']:
+            try:
+                float(request.form['startVal'])
+            except:
+                error = 'Looks like the start value is not a number'
+                return render_template('cardManagement.html', cards=cards, error=error)
+        if request.form['endVal']:
+            try:
+                float(request.form['endVal'])
+            except:
+                error = 'Looks like the end value is not a number'
+                return render_template('cardManagement.html', cards=cards, error=error)
+
         if not request.form.get('suspendedCards'):
             query_string = '''select * from Breezecard where BreezecardNum not in (select BreezecardNum from Conflict);'''
             if request.form['cardNum']:
