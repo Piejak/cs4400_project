@@ -3,8 +3,8 @@
 <h6>Stop {{ station[0] }}</h6>
 
 {% if error %}
-<div class="error">
-    <strong>Error:</strong> {{ error }}
+<div class="alert alert-danger" role="alert"></div>
+    {{ error }}
 </div>
 {% endif %}
 

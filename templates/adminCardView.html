@@ -3,8 +3,8 @@
 <p>Card #: {{cardInfo[0]}}</p>
 <p>Current balance: ${{ cardInfo[1] }}</p>
 {% if error %}
-<div class="error">
-    <strong>Error:</strong> {{ error }}</div>
+<div class="alert alert-danger" role="alert">
+    {{ error }}</div>
 {% endif %}
 
 

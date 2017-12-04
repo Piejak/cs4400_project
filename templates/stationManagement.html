@@ -5,8 +5,8 @@
 <h2>Station Management <a href="{{url_for('create_station')}}" class="btn btn-default">Create Station</a> </h2>
 
 {% if error %}
-<div class="error">
-    <strong>Error:</strong> {{ error }}
+<div class="alert alert-danger" role="alert">
+    {{ error }}
 </div>
 {% endif %}
 
