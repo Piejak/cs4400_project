@@ -323,9 +323,15 @@ def station_view(station):
         intersection = query_db('''select Intersection from BusStationIntersection where StopID=%s''', station, one=True)
 
     if request.method == 'POST':
-        # TODO: validate the input
-        post_db('''update Station set EnterFare = %s, ClosedStatus=%s where StopID = %s limit 1''', [(station_info[2] if not request.form['entryFare'] else request.form['entryFare']), (1 if not request.form.get('isOpen') else 0), station])
-        return redirect(url_for('station_management'))
+
+        if re.match("^\d+?\.\d+?$", request.form['entryFare']) is None:
+            error = 'Entry Fare must a decimal'
+        elif float(request.form['entryFare']) < 0 or float(request.form['entryFare']) > 50:
+            error = 'Entry fare must be within the valid range'
+        else:
+            post_db('''update Station set EnterFare = %s, ClosedStatus=%s where StopID = %s limit 1''', [(station_info[2] if not request.form['entryFare'] else request.form['entryFare']), (1 if not request.form.get('isOpen') else 0), station])
+            return redirect(url_for('station_management'))
+        return render_template('stationView.html',station=station_info, error = error)
     return render_template('stationView.html', station=station_info, intersection=intersection)
 
 
