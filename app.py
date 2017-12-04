@@ -322,11 +322,25 @@ def create_station():
         error = 'You must be an admin to view this page'
         return redirect(url_for('home'))
     if request.method == 'POST':
-        #TODO: check for valid range of entry fare
-        post_db('''insert into Station values (%s, %s, %s, %s, %s);''', [request.form['stopId'], request.form['sName'], request.form['entryFare'], (1 if not request.form.get('isOpen') else 0), (1 if request.form['stationRadio'] == 'train' else 0)])
-        if request.form['stationRadio'] == 'bus':
-            post_db('''insert into BusStationIntersection values (%s, %s)''', [request.form['stopId'], request.form['nearestIntersection']])
-        return redirect(url_for('station_management'))
+
+        isTrain = request.form['stationRadio'] == 'train'
+
+        val = query_db('''select Name, isTrain from Station where Name = '{0}' and isTrain = {1}'''.format(request.form['sName'], isTrain))
+        if val:
+            error = 'The combination of station name and type must be unique'
+        elif query_db ('''select StopID from Station where StopID = '{0}' '''.format(request.form['stopId'])):
+            error = 'Must have a unique StopID'
+
+        elif re.match("^\d+?\.\d+?$", request.form['entryFare']) is None:
+            error = 'Fare must a decimal'
+        elif float(request.form['entryFare']) < 0 or float(request.form['entryFare']) > 50:
+            error = 'Entry fare must be within the valid range'
+        else:
+            post_db('''insert into Station values (%s, %s, %s, %s, %s);''', [request.form['stopId'], request.form['sName'], request.form['entryFare'], (1 if not request.form.get('isOpen') else 0), (1 if request.form['stationRadio'] == 'train' else 0)])
+            if request.form['stationRadio'] == 'bus':
+                post_db('''insert into BusStationIntersection values (%s, %s)''', [request.form['stopId'], request.form['nearestIntersection']])
+            return redirect(url_for('station_management'))
+        return render_template('createStation.html', error = error)
     return render_template('createStation.html')
 
 @app.route("/welcome")
