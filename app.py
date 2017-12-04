@@ -56,6 +56,9 @@ def user_home():
         if request.form['start'] != 'onTrip':
             #we haven't started a trip yet
             #TODO: check to make sure there's enough money
+            if query_db('''select Value from Breezecard where BreezecardNum={}'''.format(request.form['card']), one=True)[0] < query_db('''select EnterFare from Station where StopID={}'''.format(request.form['start']), one=True)[0]:
+                error = 'You do not have enough money for that trip'
+                return render_template('userHome.html', error=error, breezeCards=query_db('''select BreezecardNum, Value from Breezecard where BelongsTo = %s and BreezecardNum not in (select BreezecardNum from Conflict);''', session['user_id']), startStations=start_stations, startStation=start_station_name, endStations=end_stations)
             post_db('''insert into Trip values ((select EnterFare from Station where StopID="{}"), "{}", {}, "{}", NULL);'''.format(
                 request.form['start'], datetime.now(), request.form['card'], request.form['start']))
             post_db(
