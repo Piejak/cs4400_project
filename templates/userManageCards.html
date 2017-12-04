@@ -10,8 +10,12 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>Card Number</th>
-            <th>Value</th>
+            <th>Card Number (
+            <a href="{{ url_for('user_manage_cards', field='BreezecardNum', asc=1) }}">asc</a>/
+            <a href="{{ url_for('user_manage_cards', field='BreezecardNum', asc=0) }}">desc</a>)</th>
+            <th>Value (
+            <a href="{{ url_for('user_manage_cards', field='Value', asc=1) }}">asc</a>/
+            <a href="{{ url_for('user_manage_cards', field='Value', asc=0) }}">desc</a>)</th>
             <th>Remove?</th>
             <th>Add Funds?</th>
         </tr>

@@ -69,7 +69,7 @@ def user_manage_cards():
                     post_db('''update Breezecard set BelongsTo="{}" where BreezecardNum={}'''.format(session['user_id'], request.form['cardNum']))
                 else:
                     post_db('''insert into Breezecard values ({}, 0.00, "{}")'''.format(request.form['cardNum'], session['user_id']))
-    return render_template('userManageCards.html', breezeCards=query_db('''select BreezeCardNum, Value from Breezecard where BelongsTo = %s and BreezecardNum not in (select BreezecardNum from Conflict);''', session['user_id']))
+    return render_template('userManageCards.html', breezeCards=query_db('''select BreezeCardNum, Value from Breezecard where BelongsTo = "{}" and BreezecardNum not in (select BreezecardNum from Conflict) order by {} {};'''.format(session['user_id'], (request.args.get('field') if request.args.get('field') else 'BreezecardNum'), ('asc' if request.args.get('asc') != '0' else 'desc'))))
 
 
 @app.route('/usercards/<breezecard>', methods=['GET', 'POST'])
