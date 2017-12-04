@@ -81,10 +81,21 @@ def add_funds(breezecard):
         #if the breezecard doesnt belong to the logged in user
         return redirect(url_for('home'))
     card_info = query_db('''select BreezecardNum, Value from Breezecard where BreezecardNum = %s''', breezecard, one=True)
+    
     if request.method == 'POST':
-        #TODO: validate input
-        post_db('''update Breezecard set Value= Value + {} where BreezecardNum={} limit 1'''.format(float(request.form['value']), breezecard))
-        return redirect(url_for('user_manage_cards'))
+        new_val = request.form['value']
+        old_val = query_db('''select Value from Breezecard where BreezecardNum = {0} '''.format(breezecard), one=True)[0]
+
+        if not request.form['cardNum'].isnumeric() or len(request.form['cardNum']) != 16:
+            error = 'Invalid credit card number'
+        elif not new_val.isnumeric():
+            error = 'Additional funds must a decimal'
+        elif float(new_val) + float(old_val) > 1000:
+            error = 'New card value cannot exceed $1000.00'
+        else:
+            post_db('''update Breezecard set Value= Value + {} where BreezecardNum={} limit 1'''.format(float(request.form['value']), breezecard))
+            return redirect(url_for('user_manage_cards'))
+        return render_template('addFunds.html', cardInfo=card_info, error=error)
     return render_template('addFunds.html', cardInfo=card_info)
 
 @app.route('/cardDelete/<breezecard>')
