@@ -62,7 +62,8 @@ def user_manage_cards():
             current_holder = query_db('''select BelongsTo from Breezecard where BreezecardNum={}'''.format(request.form['cardNum']), one=True)
             if current_holder:
                 current_holder = current_holder[0]
-                post_db('''insert into Conflict values ("{}", {}, "{}")'''.format(session['user_id'], request.form['cardNum'], str(datetime.now())))
+                if current_holder != session['user_id']:
+                    post_db('''insert into Conflict values ("{}", {}, "{}")'''.format(session['user_id'], request.form['cardNum'], str(datetime.now())))
             else:
                 in_db = query_db('''select BreezecardNum from Breezecard where BreezecardNum={}'''.format(request.form['cardNum']), one=True)
                 if in_db:
