@@ -31,7 +31,9 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>Station Name</th>
+            <th>Station Name (
+            <a href="{{ url_for('flow_report', field='stationName', asc=1) }}">asc</a>/
+            <a href="{{ url_for('flow_report', field='stationName', asc=0) }}">desc</a>)</th>
             <th># Passengers In</th>
             <th># Passengers Out</th>
             <th>Flow</th>

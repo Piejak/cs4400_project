@@ -119,7 +119,8 @@ def trip_history():
 def suspended_cards():
     if not g.admin:
         return redirect(url_for('home'))
-    suspended = query_db('''select Username, Conflict.BreezecardNum, DateTime, BelongsTo from Conflict, Breezecard where Breezecard.BreezecardNum=Conflict.BreezecardNum;;''')
+    suspended = query_db('''select Username, Conflict.BreezecardNum, DateTime, BelongsTo from Conflict, Breezecard where Breezecard.BreezecardNum=Conflict.BreezecardNum order by {} {};'''.format(
+        (request.args.get('field') if request.args.get('field') else 'Conflict.BreezecardNum'), ('desc' if request.args.get('asc') == '0' else 'asc')))
     return render_template('suspendedCards.html', cards=suspended)
 
 @app.route('/assignCard')
@@ -232,7 +233,7 @@ def flow_report():
         return redirect(url_for('home'))
     #TODO:implement dates
     flow = query_db('''
-select distinct (select Name from Station where StopID=flowIn.startID), flowIn.passIn, flowOut.passOut, flowIn.passIn-flowOut.passOut, revenue.money 
+select distinct (select Name from Station where StopID=flowIn.startID) as stationName, flowIn.passIn, flowOut.passOut, flowIn.passIn-flowOut.passOut, revenue.money 
 from
 (select StopID as startID, count(startTrip.StartsAt) as passIn
 from Station 
@@ -249,8 +250,10 @@ join
 (select StartsAt, sum(Tripfare) as money
 from Trip
 group by Trip.StartsAt) as revenue on (flowIn.startID=revenue.StartsAt)
-group by flowIn.startID;
-''')
+group by flowIn.startID
+order by {} {};
+'''.format(
+        (request.args.get('field') if request.args.get('field') else 'stationName'), ('asc' if request.args.get('asc') == '0' else 'desc')))
 
     if request.method == 'POST':
         if request.form['startTime'] and request.form['endTime']:
@@ -292,8 +295,6 @@ group by flowIn.startID;
 def station_management():
     if not g.admin:
         return redirect(url_for('home'))
-    print('''select * from Station order by {} {};'''.format((request.args.get('field')
-                                                              if request.args.get('field') else 'Name'), ('asc;' if not request.args.get('asc') else 'desc;')))
     return render_template('stationManagement.html', stations=query_db('''select * from Station order by {} {};'''.format((request.args.get('field') if request.args.get('field') else 'Name'), ('desc' if request.args.get('asc')!='0' else 'asc'))))
 
 @app.route('/stations/<station>', methods=['GET', 'POST'])

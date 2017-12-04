@@ -10,9 +10,13 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>Card #</th>
+            <th>Card # (
+            <a href="{{ url_for('suspended_cards', field='Conflict.BreezecardNum', asc=1) }}">asc</a>/
+            <a href="{{ url_for('suspended_cards', field='Conflict.BreezecardNum', asc=0) }}">desc</a>)</th>
             <th>New Owner</th>
-            <th>Date Suspended</th>
+            <th>Date Suspended (
+            <a href="{{ url_for('suspended_cards', field='DateTime', asc=1) }}">asc</a>/
+            <a href="{{ url_for('suspended_cards', field='DateTime', asc=0) }}">desc</a>)</th>
             <th>Previous Owner</th>
             <th>Assign to New Owner</th>
             <th>Assign to Previous Owner</th>
