@@ -93,7 +93,7 @@ def delete_card(breezecard):
     if query_db('''select BelongsTo from Breezecard where BreezecardNum = %s''', breezecard, one=True)[0] != session['user_id']:
         #if the breezecard doesnt belong to the logged in user
         return redirect(url_for('home'))
-    number_cards = query_db('''select count(BreezecardNum) from Breezecard where BelongsTo=%s group by BelongsTo''', session['user_id'], one=True)[0]
+    number_cards = query_db('''select count(BreezecardNum) from Breezecard where BelongsTo=%s and BreezecardNum not in (select BreezecardNum from Conflict) group by BelongsTo''', session['user_id'], one=True)[0]
     if number_cards == 1:
         return redirect(url_for('user_manage_cards'))
     post_db('''update Breezecard set BelongsTo=NULL where BreezecardNum=%s limit 1''', breezecard)
