@@ -291,7 +291,9 @@ group by flowIn.startID;
 def station_management():
     if not g.admin:
         return redirect(url_for('home'))
-    return render_template('stationManagement.html', stations=query_db('''select * from Station order by {} {};'''.format((request.args.get('field') if request.args.get('field') else 'Name'), ('asc' if request.args.get('asc') else 'desc'))))
+    print('''select * from Station order by {} {};'''.format((request.args.get('field')
+                                                              if request.args.get('field') else 'Name'), ('asc;' if not request.args.get('asc') else 'desc;')))
+    return render_template('stationManagement.html', stations=query_db('''select * from Station order by {} {};'''.format((request.args.get('field') if request.args.get('field') else 'Name'), ('desc' if request.args.get('asc')!='0' else 'asc'))))
 
 @app.route('/stations/<station>', methods=['GET', 'POST'])
 def station_view(station):
