@@ -268,6 +268,8 @@ def admin_card_view(breezecard):
             error = 'Enter a valid value'
         elif get_user_id(request.form['username']) is None:
             error = 'That user does not exist'
+        elif query_db('''select Username from User where Username="{}" and IsAdmin=TRUE'''.format(request.form['username'])):
+            error = 'You cannot assign a Breezecard to an Admin'
         else:
             post_db('''update Breezecard set Value=%s, BelongsTo=%s where BreezecardNum=%s limit 1''', [(request.form['value'] if request.form['value'] else card_info[1]), (request.form['username'] if request.form['username'] else card_info[2]), breezecard])
             return redirect(url_for('card_management'))            
