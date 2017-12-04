@@ -47,7 +47,11 @@
             <td>{{flow[1]}}</td>
             <td>{{flow[2]}}</td>
             <td>{{flow[3]}}</td>
+            {% if flow[4] %}
             <td>${{flow[4]}}</td>
+            {% else %}
+            <td>No revenue</td>
+            {% endif %}
         </tr>
         {% endfor %}
     </tbody>

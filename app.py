@@ -283,7 +283,7 @@ from Station
 left join Trip as endTrip
 on (Station.StopID=endTrip.EndsAt)
 group by Station.StopID) as flowOut on (flowIn.startID=flowOut.StopID)
-join
+left join
 (select StartsAt, sum(Tripfare) as money
 from Trip
 group by Trip.StartsAt) as revenue on (flowIn.startID=revenue.StartsAt)
@@ -309,23 +309,65 @@ from Station
 left join Trip as endTrip
 on (Station.StopID=endTrip.EndsAt and endTrip.StartTime < "{}" and endTrip.StartTime > "{}")
 group by Station.StopID) as flowOut on (flowIn.startID=flowOut.StopID)
-join
+left join
 (select StartsAt, sum(Tripfare) as money
 from Trip
 where (Trip.StartTime < "{}" and Trip.StartTime > "{}")
 group by Trip.StartsAt) as revenue on (flowIn.startID=revenue.StartsAt)
 group by flowIn.startID;
 '''.format(request.form['endTime'], request.form['startTime'], request.form['endTime'], request.form['startTime'], request.form['endTime'], request.form['startTime'])
-            print(query_statement)
             flow = query_db(query_statement)
             return render_template('flowReport.html', flows=flow)
         elif request.form['startTime']:
             #we just have start time
-            return render_template('flowReport.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime > %s);''', [session['user_id'], request.form['startTime']]))
+            query_statement = '''
+select distinct (select Name from Station where StopID=flowIn.startID), flowIn.passIn, flowOut.passOut, flowIn.passIn-flowOut.passOut, revenue.money 
+from
+(select StopID as startID, count(startTrip.StartsAt) as passIn, StartTime
+from Station 
+left join Trip as startTrip
+on (Station.StopID=startTrip.StartsAt and startTrip.StartTime > "{}")
+group by startID) as flowIn
+join
+(select StopID, count(endTrip.EndsAt) as passOut, StartTime
+from Station 
+left join Trip as endTrip
+on (Station.StopID=endTrip.EndsAt and endTrip.StartTime > "{}")
+group by Station.StopID) as flowOut on (flowIn.startID=flowOut.StopID)
+left join
+(select StartsAt, sum(Tripfare) as money
+from Trip
+where (Trip.StartTime > "{}")
+group by Trip.StartsAt) as revenue on (flowIn.startID=revenue.StartsAt)
+group by flowIn.startID;
+'''.format(request.form['startTime'], request.form['startTime'], request.form['startTime'])
+            flow = query_db(query_statement)
+            return render_template('flowReport.html', flows=flow)
         elif request.form['endTime']:
             #we just have end time
-            return render_template('flowReport.html', trips=query_db('''select * from Trip where (BreezecardNum in (select BreezecardNum from Breezecard where BelongsTo = %s)) AND (StartTime < %s);''', [session['user_id'], request.form['endTime']]))
-
+            query_statement = '''
+select distinct (select Name from Station where StopID=flowIn.startID), flowIn.passIn, flowOut.passOut, flowIn.passIn-flowOut.passOut, revenue.money 
+from
+(select StopID as startID, count(startTrip.StartsAt) as passIn, StartTime
+from Station 
+left join Trip as startTrip
+on (Station.StopID=startTrip.StartsAt and startTrip.StartTime < "{}")
+group by startID) as flowIn
+join
+(select StopID, count(endTrip.EndsAt) as passOut, StartTime
+from Station 
+left join Trip as endTrip
+on (Station.StopID=endTrip.EndsAt and endTrip.StartTime < "{}")
+group by Station.StopID) as flowOut on (flowIn.startID=flowOut.StopID)
+left join
+(select StartsAt, sum(Tripfare) as money
+from Trip
+where (Trip.StartTime < "{}")
+group by Trip.StartsAt) as revenue on (flowIn.startID=revenue.StartsAt)
+group by flowIn.startID;
+'''.format(request.form['endTime'], request.form['endTime'], request.form['endTime'])
+            flow = query_db(query_statement)
+            return render_template('flowReport.html', flows=flow)
     return render_template('flowReport.html', flows=flow)
 
 @app.route("/stationManagement")
